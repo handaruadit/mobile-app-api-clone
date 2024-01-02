@@ -1,0 +1,50 @@
+openapi: 3.0.0
+info:
+  title: Hello World
+  version: 1.0.0
+paths:
+  /protected/user:
+    get:
+      description: Update a given entity
+      tags:
+        - protected
+      responses:
+        "200":
+          description: Returns the entity
+          content:
+            application/json:
+              schema:
+                $ref: ./components.yaml#/components/schemas/OutputProtectedUserList
+  "/protected/user/{id}":
+    put:
+      description: Update a given entity
+      tags:
+        - protected
+      requestBody:
+        description: Optional description in *Markdown*
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: ./components.yaml#/components/schemas/InputProtectedUserPutBody
+      responses:
+        "200":
+          description: Returns the updated entity
+          content:
+            application/json:
+              schema:
+                $ref: ./components.yaml#/components/schemas/OutputProtectedUserPut
+  "/public/invitation/{id}":
+    get:
+      description: Update a given entity
+      tags:
+        - public
+      responses:
+        "200":
+          description: Returns the entity
+          content:
+            application/json:
+              schema:
+                $ref: ./components.yaml#/components/schemas/OutputPublicInvitationGet
+components: {}
+tags: []

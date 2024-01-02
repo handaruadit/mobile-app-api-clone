@@ -1,0 +1,34 @@
+{
+  "ts-node": {
+    "require": ["tsconfig-paths/register"]
+  },
+  "compilerOptions": {
+    "baseUrl": "./src",
+    "paths": {
+      "@/*": ["*"]
+    },
+    "target": "es2019",
+    "module": "commonjs",
+    "lib": ["es6"],
+    "moduleResolution": "node",
+    "sourceMap": true,
+    "noImplicitAny": true,
+    "strict": true,
+    "skipLibCheck": true,
+    "removeComments": true,
+    "preserveConstEnums": true,
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "strictPropertyInitialization": false,
+    "noUnusedLocals": true,
+    "esModuleInterop": true,
+    "types": ["node", "jest"],
+    "outDir": "dist",
+    "allowSyntheticDefaultImports": true,
+    "resolveJsonModule": true,
+    "declaration": true,
+    "allowJs": false
+  },
+  "exclude": ["node_modules"],
+  "include": ["src/**/*", "tests/**/*", ".eslintrc.js"]
+}

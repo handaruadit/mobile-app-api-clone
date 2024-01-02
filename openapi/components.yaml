@@ -1,0 +1,577 @@
+openapi: 3.0.0
+info:
+  title: Converted from components.yaml with typeconv
+  version: '1'
+  x-id: components.yaml
+  x-comment: >-
+    Generated from openapi/components.d.ts by core-types-json-schema
+    (https://github.com/grantila/core-types-json-schema) on behalf of typeconv
+    (https://github.com/grantila/typeconv)
+paths: {}
+components:
+  schemas:
+    ICompanyModel:
+      title: ICompanyModel
+    ICompanyModelOutput:
+      title: ICompanyModelOutput
+    ICompanyModelPayload:
+      title: ICompanyModelPayload
+    ICompanyModelWithId:
+      allOf:
+        - $ref: '#/components/schemas/ICompanyModel'
+        - properties:
+            _id:
+              title: _id
+          required:
+            - _id
+          additionalProperties: false
+          type: object
+      title: ICompanyModelWithId
+    ICompanyOwner:
+      properties:
+        id:
+          title: ICompanyOwner.id
+          type: string
+        name:
+          title: ICompanyOwner.name
+          type: string
+        email:
+          title: ICompanyOwner.email
+          type: string
+      required:
+        - id
+        - name
+        - email
+      additionalProperties: false
+      title: ICompanyOwner
+      type: object
+    InputProtectedUserPutBody:
+      properties:
+        email:
+          title: InputProtectedUserPutBody.email
+          type: string
+        name:
+          title: InputProtectedUserPutBody.name
+          type: string
+        job:
+          title: InputProtectedUserPutBody.job
+          type: string
+        department:
+          title: InputProtectedUserPutBody.department
+      required:
+        - email
+      additionalProperties: false
+      title: InputProtectedUserPutBody
+      type: object
+    IProtectedUserEntity:
+      properties:
+        _id:
+          title: IProtectedUserEntity._id
+          type: string
+        name:
+          title: IProtectedUserEntity.name
+          type: string
+        email:
+          title: IProtectedUserEntity.email
+          type: string
+        createdAt:
+          title: IProtectedUserEntity.createdAt
+          type: string
+        updatedAt:
+          title: IProtectedUserEntity.updatedAt
+          type: string
+        crispTokenId:
+          title: IProtectedUserEntity.crispTokenId
+          type: string
+        job:
+          title: IProtectedUserEntity.job
+          type: string
+        department:
+          title: IProtectedUserEntity.department
+      required:
+        - _id
+        - email
+        - createdAt
+        - updatedAt
+        - crispTokenId
+      additionalProperties: false
+      title: IProtectedUserEntity
+      type: object
+    ITokenInvitationModel:
+      title: ITokenInvitationModel
+    ITokenInvitationModelOutput:
+      title: ITokenInvitationModelOutput
+    ITokenInvitationModelWithId:
+      allOf:
+        - $ref: '#/components/schemas/ITokenInvitationModel'
+        - properties:
+            _id:
+              title: _id
+          required:
+            - _id
+          additionalProperties: false
+          type: object
+      title: ITokenInvitationModelWithId
+    ITokenModel:
+      title: ITokenModel
+    ITokenModelOutput:
+      title: ITokenModelOutput
+    ITokenModelWithId:
+      allOf:
+        - $ref: '#/components/schemas/ITokenModel'
+        - properties:
+            _id:
+              title: _id
+          required:
+            - _id
+          additionalProperties: false
+          type: object
+      title: ITokenModelWithId
+    IUserModel:
+      title: IUserModel
+    IUserModelOutput:
+      title: IUserModelOutput
+    IUserModelWithId:
+      allOf:
+        - $ref: '#/components/schemas/IUserModel'
+        - properties:
+            _id:
+              title: _id
+          required:
+            - _id
+          additionalProperties: false
+          type: object
+      title: IUserModelWithId
+    IWorkspaceModel:
+      title: IWorkspaceModel
+    IWorkspaceModelOutput:
+      title: IWorkspaceModelOutput
+    IWorkspaceModelPayload:
+      properties:
+        members:
+          title: members
+        ownerId:
+          title: ownerId
+      additionalProperties: false
+      title: IWorkspaceModelPayload
+      type: object
+    IWorkspaceModelWithId:
+      allOf:
+        - $ref: '#/components/schemas/IWorkspaceModel'
+        - properties:
+            _id:
+              title: _id
+            _owner:
+              title: _owner
+            _members:
+              items:
+                properties:
+                  permissions:
+                    items: {}
+                    title: permissions
+                    type: array
+                additionalProperties: false
+                type: object
+              title: _members
+              type: array
+          required:
+            - _id
+            - _owner
+            - _members
+          additionalProperties: false
+          type: object
+      title: IWorkspaceModelWithId
+    JWTDecodedOutput:
+      properties:
+        iss:
+          title: JWTDecodedOutput.iss
+          type: string
+        id:
+          title: JWTDecodedOutput.id
+          type: string
+        email:
+          title: JWTDecodedOutput.email
+          type: string
+        company:
+          properties:
+            id:
+              title: JWTDecodedOutput.company.id
+              type: string
+            owner:
+              title: JWTDecodedOutput.company.owner
+              type: boolean
+          required:
+            - id
+            - owner
+          additionalProperties: false
+          title: JWTDecodedOutput.company
+          type: object
+        workspace:
+          properties:
+            id:
+              title: JWTDecodedOutput.workspace.id
+              type: string
+            owner:
+              title: JWTDecodedOutput.workspace.owner
+              type: boolean
+          required:
+            - id
+            - owner
+          additionalProperties: false
+          title: JWTDecodedOutput.workspace
+          type: object
+        permissions:
+          items: {}
+          title: JWTDecodedOutput.permissions
+          type: array
+      required:
+        - id
+        - email
+      additionalProperties: false
+      title: JWTDecodedOutput
+      type: object
+    OutputError:
+      properties:
+        error:
+          properties:
+            code:
+              title: OutputError.error.code
+            payload:
+              title: OutputError.error.payload
+          required:
+            - code
+          additionalProperties: false
+          title: OutputError.error
+          type: object
+      required:
+        - error
+      additionalProperties: false
+      title: OutputError
+      type: object
+    OutputProtectedCompanyDelete:
+      properties:
+        code:
+          title: OutputProtectedCompanyDelete.code
+      required:
+        - code
+      additionalProperties: false
+      title: OutputProtectedCompanyDelete
+      type: object
+    OutputProtectedCompanyList:
+      properties:
+        company:
+          $ref: '#/components/schemas/ICompanyModelOutput'
+          title: OutputProtectedCompanyList.company
+      required:
+        - company
+      additionalProperties: false
+      title: OutputProtectedCompanyList
+      type: object
+    OutputProtectedCompanyPost:
+      properties:
+        company:
+          $ref: '#/components/schemas/ICompanyModelOutput'
+          title: OutputProtectedCompanyPost.company
+      required:
+        - company
+      additionalProperties: false
+      title: OutputProtectedCompanyPost
+      type: object
+    OutputProtectedCompanyPut:
+      properties:
+        company:
+          $ref: '#/components/schemas/ICompanyModelOutput'
+          title: OutputProtectedCompanyPut.company
+      required:
+        - company
+      additionalProperties: false
+      title: OutputProtectedCompanyPut
+      type: object
+    OutputProtectedRefreshPost:
+      properties:
+        tokens:
+          $ref: '#/components/schemas/OutputTokens'
+          title: OutputProtectedRefreshPost.tokens
+      required:
+        - tokens
+      additionalProperties: false
+      title: OutputProtectedRefreshPost
+      type: object
+    OutputProtectedUserList:
+      properties:
+        user:
+          $ref: '#/components/schemas/IProtectedUserEntity'
+          title: OutputProtectedUserList.user
+      required:
+        - user
+      additionalProperties: false
+      title: OutputProtectedUserList
+      type: object
+    OutputProtectedUserPut:
+      properties:
+        user:
+          $ref: '#/components/schemas/IProtectedUserEntity'
+          title: OutputProtectedUserPut.user
+      required:
+        - user
+      additionalProperties: false
+      title: OutputProtectedUserPut
+      type: object
+    OutputProtectedWorkspaceDelete:
+      properties:
+        code:
+          title: OutputProtectedWorkspaceDelete.code
+      required:
+        - code
+      additionalProperties: false
+      title: OutputProtectedWorkspaceDelete
+      type: object
+    OutputProtectedWorkspaceGet:
+      properties:
+        workspace:
+          allOf:
+            - $ref: '#/components/schemas/IWorkspaceModelOutput'
+            - properties:
+                invitations:
+                  items:
+                    $ref: '#/components/schemas/ITokenInvitationModelOutput'
+                    title: invitations.[]
+                  title: invitations
+                  type: array
+                _companyOwner:
+                  title: _companyOwner
+              required:
+                - invitations
+                - _companyOwner
+              additionalProperties: false
+              type: object
+          title: OutputProtectedWorkspaceGet.workspace
+      required:
+        - workspace
+      additionalProperties: false
+      title: OutputProtectedWorkspaceGet
+      type: object
+    OutputProtectedWorkspaceInvitationDelete:
+      properties:
+        code:
+          title: OutputProtectedWorkspaceInvitationDelete.code
+      required:
+        - code
+      additionalProperties: false
+      title: OutputProtectedWorkspaceInvitationDelete
+      type: object
+    OutputProtectedWorkspaceInvitationList:
+      properties:
+        tokens:
+          items:
+            $ref: '#/components/schemas/ITokenInvitationModelOutput'
+            title: OutputProtectedWorkspaceInvitationList.tokens.[]
+          title: OutputProtectedWorkspaceInvitationList.tokens
+          type: array
+      required:
+        - tokens
+      additionalProperties: false
+      title: OutputProtectedWorkspaceInvitationList
+      type: object
+    OutputProtectedWorkspaceInvitationPut:
+      properties:
+        code:
+          title: OutputProtectedWorkspaceInvitationPut.code
+      required:
+        - code
+      additionalProperties: false
+      title: OutputProtectedWorkspaceInvitationPut
+      type: object
+    OutputProtectedWorkspaceInvitationResendPut:
+      properties:
+        code:
+          title: OutputProtectedWorkspaceInvitationResendPut.code
+      required:
+        - code
+      additionalProperties: false
+      title: OutputProtectedWorkspaceInvitationResendPut
+      type: object
+    OutputProtectedWorkspaceList:
+      properties:
+        workspaces:
+          items:
+            allOf:
+              - $ref: '#/components/schemas/IWorkspaceModelOutput'
+              - properties:
+                  invitationCount:
+                    title: invitationCount
+                    type: number
+                  companyNames:
+                    title: companyNames
+                    type: string
+                required:
+                  - invitationCount
+                additionalProperties: false
+                type: object
+          title: OutputProtectedWorkspaceList.workspaces
+          type: array
+      required:
+        - workspaces
+      additionalProperties: false
+      title: OutputProtectedWorkspaceList
+      type: object
+    OutputProtectedWorkspacePost:
+      properties:
+        workspace:
+          $ref: '#/components/schemas/IWorkspaceModelOutput'
+          title: OutputProtectedWorkspacePost.workspace
+      required:
+        - workspace
+      additionalProperties: false
+      title: OutputProtectedWorkspacePost
+      type: object
+    OutputProtectedWorkspacePut:
+      properties:
+        workspace:
+          $ref: '#/components/schemas/IWorkspaceModelOutput'
+          title: OutputProtectedWorkspacePut.workspace
+      required:
+        - workspace
+      additionalProperties: false
+      title: OutputProtectedWorkspacePut
+      type: object
+    OutputProtectedWorkspaceSwitchPut:
+      properties:
+        tokens:
+          $ref: '#/components/schemas/OutputTokens'
+          title: OutputProtectedWorkspaceSwitchPut.tokens
+      required:
+        - tokens
+      additionalProperties: false
+      title: OutputProtectedWorkspaceSwitchPut
+      type: object
+    OutputProtectedWorkspaceUserDelete:
+      properties:
+        code:
+          title: OutputProtectedWorkspaceUserDelete.code
+      required:
+        - code
+      additionalProperties: false
+      title: OutputProtectedWorkspaceUserDelete
+      type: object
+    OutputProtectedWorkspaceUserPost:
+      properties:
+        code:
+          title: OutputProtectedWorkspaceUserPost.code
+      required:
+        - code
+      additionalProperties: false
+      title: OutputProtectedWorkspaceUserPost
+      type: object
+    OutputProtectedWorkspaceUserPut:
+      properties:
+        code:
+          title: OutputProtectedWorkspaceUserPut.code
+      required:
+        - code
+      additionalProperties: false
+      title: OutputProtectedWorkspaceUserPut
+      type: object
+    OutputPublicForgot:
+      properties:
+        code:
+          title: OutputPublicForgot.code
+      required:
+        - code
+      additionalProperties: false
+      title: OutputPublicForgot
+      type: object
+    OutputPublicInvitationGet:
+      properties:
+        userEmail:
+          title: OutputPublicInvitationGet.userEmail
+          type: string
+        company:
+          title: OutputPublicInvitationGet.company
+          type: string
+        workspace:
+          title: OutputPublicInvitationGet.workspace
+          type: string
+      required:
+        - userEmail
+        - company
+        - workspace
+      additionalProperties: false
+      title: OutputPublicInvitationGet
+      type: object
+    OutputPublicInvitationPost:
+      properties:
+        tokens:
+          $ref: '#/components/schemas/OutputTokens'
+          title: OutputPublicInvitationPost.tokens
+      required:
+        - tokens
+      additionalProperties: false
+      title: OutputPublicInvitationPost
+      type: object
+    OutputPublicLoginPost:
+      properties:
+        tokens:
+          $ref: '#/components/schemas/OutputTokens'
+          title: OutputPublicLoginPost.tokens
+      required:
+        - tokens
+      additionalProperties: false
+      title: OutputPublicLoginPost
+      type: object
+    OutputPublicResetGet:
+      properties:
+        token:
+          title: OutputPublicResetGet.token
+          type: string
+        expireAt:
+          title: OutputPublicResetGet.expireAt
+      required:
+        - token
+        - expireAt
+      additionalProperties: false
+      title: OutputPublicResetGet
+      type: object
+    OutputPublicResetPost:
+      properties:
+        code:
+          title: OutputPublicResetPost.code
+      required:
+        - code
+      additionalProperties: false
+      title: OutputPublicResetPost
+      type: object
+    OutputPublicSignupPost:
+      properties:
+        tokens:
+          $ref: '#/components/schemas/OutputTokens'
+          title: OutputPublicSignupPost.tokens
+      required:
+        - tokens
+      additionalProperties: false
+      title: OutputPublicSignupPost
+      type: object
+    OutputRunnerWorkspaceGet:
+      properties:
+        workspace:
+          $ref: '#/components/schemas/IWorkspaceModelOutput'
+          title: OutputRunnerWorkspaceGet.workspace
+      required:
+        - workspace
+      additionalProperties: false
+      title: OutputRunnerWorkspaceGet
+      type: object
+    OutputTokens:
+      properties:
+        accessToken:
+          title: OutputTokens.accessToken
+          type: string
+        refreshToken:
+          title: OutputTokens.refreshToken
+          type: string
+      required:
+        - accessToken
+        - refreshToken
+      additionalProperties: false
+      title: OutputTokens
+      type: object
