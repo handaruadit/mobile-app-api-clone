@@ -1,6 +1,5 @@
 import { model, Schema, InferSchemaType } from 'mongoose';
 import type { Types, Model } from 'mongoose';
-import { v4 as UUIDV4 } from 'uuid';
 import isEmail from 'validator/lib/isEmail';
 
 import { StringIds } from '@/interfaces/common';

@@ -1,10 +1,9 @@
-import { model, Schema, isValidObjectId } from 'mongoose';
-import type { InferSchemaType, Types, Model, Query } from 'mongoose';
+import { model, Schema } from 'mongoose';
+import type { InferSchemaType, Types, Model } from 'mongoose';
 
 import Abstract from '@/models/abstract';
 
 import { StringIds } from '@/interfaces/common';
-import { ValidationErrorCodes } from '@/lib/enum';
 
 const schema = new Schema(
   {

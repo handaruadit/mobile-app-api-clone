@@ -2,14 +2,12 @@
 import isEmail from 'validator/lib/isEmail';
 import isLength from 'validator/lib/isLength';
 
-import { user as entity, company as entityCompany } from '@/models';
-import { workspace as entityWorkspace } from '@/models';
+import { user as entity } from '@/models';
 import { IUserModelWithId } from '@/models/user';
-import { IWorkspaceModelWithId } from '@/models/workspace';
-import { ICompanyModelWithId, OutputPublicLoginPost } from '@/types';
+import { OutputPublicLoginPost } from '@/types';
 
 import { comparePassword } from '@/lib/encode';
-import { Entities, ErrorCodes, Roles } from '@/lib/enum';
+import { ErrorCodes } from '@/lib/enum';
 import Exception from '@/lib/exception';
 import { generateJwtTokens } from '@/lib/jwt';
 import resource from '@/middleware/resource-router-middleware';

@@ -22,7 +22,7 @@ import { ErrorCodes, ReturnCodes } from '@/lib/enum';
 import Exception from '@/lib/exception';
 import resource from '@/middleware/resource-router-middleware';
 
-async function sendPaymentAccountCreation(
+export async function sendPaymentAccountCreation(
   urlApi: string,
   {
     name,

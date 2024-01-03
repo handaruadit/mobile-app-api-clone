@@ -9,7 +9,6 @@ export interface IProtectedUserEntity {
   email?: string;
   createdAt: NativeDate | string;
   updatedAt: NativeDate | string;
-  crispTokenId: string;
   job?: string;
   department?: Departments;
 }
