@@ -18,10 +18,6 @@ RUN mkdir -p /app
 
 COPY package.json pnpm-lock.yaml /app/
 
-RUN  echo "@displayeo:registry=https://npm.masjidway.me/" > /app/.npmrc \
-  && echo "always-auth=true" >> /app/.npmrc \
-  && echo "//npm.masjidway.me/:_authToken=${NPM_TOKEN}" >> /app/.npmrc
-
 RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile
 
 

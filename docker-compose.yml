@@ -5,16 +5,16 @@ services:
     image: bitnami/redis:6.0
     container_name: cache
     environment:
-      - REDIS_PASSWORD=password123
+      - REDIS_PASSWORD=${REDIS_PASSWORD}
     ports:
       - '6379:6379'
-  myazan:
-    build: .
-    environment:
-      - PORT=8080
-      - NODE_ENV=production
-      - MONGO_URI=mongodb://root:dev@51.15.189.132:40003/core
-      - REDIS_URL=redis://cache
-      - REDIS_PASSWORD=password123
-    ports:
-      - '8080:8080'
+  # otherservices:
+  #   build: .
+  #   environment:
+  #     - PORT=8080
+  #     - NODE_ENV=production
+  #     - MONGO_URI=${MONGO_URI}
+  #     - REDIS_URL=${REDIS_URL}
+  #     - REDIS_PASSWORD=${REDIS_PASSWORD}
+  #   ports:
+  #     - '8080:8080'

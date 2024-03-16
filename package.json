@@ -3,8 +3,8 @@
   "version": "1.6.3",
   "description": "Batari Core API",
   "license": "UNLICENSED",
-  "main": "build/index.js",
-  "types": "build/index.d.ts",
+  "main": "dist/src/index.js",
+  "types": "dist/src/index.d.ts",
   "files": [
     "build"
   ],

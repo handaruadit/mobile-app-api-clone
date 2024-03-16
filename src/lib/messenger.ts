@@ -62,7 +62,7 @@ class Messenger {
           batteryPower: payload.battery_power,
           sentAt: payload.sent_at,
           receivedAt: new Date()
-        })
+        });
         return saving;
       case 'inverter.status':
         console.log('status data', type, id, payload);
