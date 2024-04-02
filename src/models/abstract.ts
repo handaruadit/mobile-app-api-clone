@@ -50,6 +50,10 @@ export default class Abdstract {
       query = query.skip(skip);
     }
 
+    if (skip) {
+      query = query.skip(skip);
+    }
+
     if (limit) {
       query = query.limit(limit);
     }
