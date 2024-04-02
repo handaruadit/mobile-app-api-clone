@@ -65,29 +65,6 @@ export default () =>
       //   ownerId: alreadyExists._id
       // });
 
-      // const [workspacesOfUser] =
-      //   await entityWorkspace.find<IWorkspaceModelWithId>({
-      //     $or: [
-      //       { ownerId: alreadyExists._id },
-      //       { companyId: company?._id },
-      //       {
-      //         members: {
-      //           $elemMatch: {
-      //             id: alreadyExists._id,
-      //             permissions: {
-      //               $elemMatch: {
-      //                 entity: Entities.WORKSPACE,
-      //                 role: {
-      //                   $in: [Roles.READ, Roles.WRITE, Roles.ADMIN]
-      //                 }
-      //               }
-      //             }
-      //           }
-      //         }
-      //       }
-      //     ]
-      //   });
-
       // if (!alreadyExists.crispTokenId) {
       //   try {
       //     const uuid = UUIDV4();
@@ -102,8 +79,7 @@ export default () =>
       // }
 
       const tokens = await generateJwtTokens({
-        user: alreadyExists,
-        // workspaceId: workspacesOfUser?._id?.toString()
+        user: alreadyExists
       });
 
       res.status(200).json({ tokens } satisfies OutputPublicLoginPost);

@@ -1,8 +1,14 @@
+
+/**
+ * Workspace is a site where users devices located.
+ * a workspace can have multiple devices.
+ * a workspace must have an admin.
+ */
 import { model, Schema, isValidObjectId } from 'mongoose';
 import type { InferSchemaType, Types, Model, Query } from 'mongoose';
 
 import Abstract from '@/models/abstract';
-import { IUserModelWithId } from '@/models/user';
+import { IUserMinimalModel } from '@/models/user';
 
 import { StringIds } from '@/interfaces/common';
 import { Entities, Roles, ValidationErrorCodes } from '@/lib/enum';
@@ -16,7 +22,16 @@ const schema = new Schema(
     },
     isDefault: {
       type: Boolean,
-      required: [true, ValidationErrorCodes.DEFAULT_REQUIRED]
+      defaultValue: false
+    },
+    coordinates: {
+      latitude: Number,
+      longitude: Number,
+      elevation: Number
+    },
+    location: {
+      type: { type: String },
+      coordinates: [Number, Number]
     },
     language: {
       type: String,
@@ -26,6 +41,10 @@ const schema = new Schema(
       type: String,
       required: [true, ValidationErrorCodes.TIMEZONE_REQUIRED]
     },
+    plnPricePerKwh: Number, // in Rupiah
+    userAvgDailyConsumption: Number, // kWh
+    calculatedAvgDailyConsumption: Number, // kWh
+    avgSunlightPerDay: Number, // hour
     ownerId: {
       type: Schema.Types.ObjectId,
       required: [true, ValidationErrorCodes.OWNER_REQUIRED],
@@ -33,15 +52,6 @@ const schema = new Schema(
       validate: {
         validator: (v: string) => isValidObjectId(v),
         message: ValidationErrorCodes.INVALID_OWNER
-      }
-    },
-    companyId: {
-      type: Schema.Types.ObjectId,
-      required: [true, ValidationErrorCodes.COMPANY_REQUIRED],
-      ref: 'Company',
-      validate: {
-        validator: (v: string) => isValidObjectId(v),
-        message: ValidationErrorCodes.INVALID_COMPANY
       }
     },
     members: [
@@ -82,8 +92,8 @@ const schema = new Schema(
 export type IWorkspaceModel = InferSchemaType<typeof schema>;
 export type IWorkspaceModelWithId = IWorkspaceModel & {
   _id: Types.ObjectId;
-  _owner: Pick<IUserModelWithId, '_id' | 'name' | 'email'>;
-  _members: (Pick<IUserModelWithId, '_id' | 'name' | 'email'> & {
+  _owner: IUserMinimalModel;
+  _members: (IUserMinimalModel & {
     permissions?: Record<string, string>[];
   })[];
 };
@@ -125,6 +135,35 @@ class MongooseModel extends Abstract {
     query
       .populate('_owner', '_id name email')
       .populate('_members', '_id name email');
+
+  findWorkspacesOfUser = async (
+    userId: Types.ObjectId | string,
+    roles: Roles[] = [Roles.READ, Roles.WRITE, Roles.ADMIN],
+    onlyOwner?: boolean,
+    select?: string
+  ): Promise<IWorkspaceModelWithId[]> => {
+    const pipeline: any[] = [ { ownerId: userId } ];
+    if (!onlyOwner) {
+      pipeline.push({
+        members: {
+          $elemMatch: {
+            id: userId,
+            permissions: {
+              $elemMatch: {
+                entity: Entities.WORKSPACE,
+                role: {
+                  $in: roles
+                }
+              }
+            }
+          }
+        }
+      });
+    }
+    return await this.find<IWorkspaceModelWithId>({
+      $or: pipeline
+    }, undefined, undefined, undefined, false, undefined, select);
+  }
 }
 
 const inst = new MongooseModel();

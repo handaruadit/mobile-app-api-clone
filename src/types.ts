@@ -12,6 +12,11 @@ export * from './models/tokenPassword';
 export * from './models/user';
 export * from './models/workspace';
 
+// ADMIN
+export * from './interfaces/endpoints/admin/user';
+export * from './interfaces/endpoints/admin/device';
+export * from './interfaces/endpoints/admin/workspace';
+
 // PUBLIC
 export * from './interfaces/endpoints/public/forgot';
 export * from './interfaces/endpoints/public/invitation';
@@ -30,6 +35,8 @@ export * from './interfaces/endpoints/protected/workspace/invitation/resend';
 export * from './interfaces/endpoints/protected/workspace/ownership';
 export * from './interfaces/endpoints/protected/workspace/switch';
 export * from './interfaces/endpoints/protected/workspace/user';
+export * from './interfaces/endpoints/protected/device';
+export * from './interfaces/endpoints/protected/workspace';
 
 // RUNNER
 export * from './interfaces/endpoints/runner/workspace';

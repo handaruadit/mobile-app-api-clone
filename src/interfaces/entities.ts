@@ -1,22 +1,34 @@
 import { Types } from 'mongoose';
 
-import { Departments, IOutputWorkspacePermission } from '@/types';
+import { DeviceDarkModeSettings, IOutputWorkspacePermission, IUserMinimalModel, ReturnCodes } from '@/types';
 
 // USER
-export interface IProtectedUserEntity {
+export interface IBaseUserEntity {
   _id: Types.ObjectId | string;
   name?: string;
-  email?: string;
-  createdAt: NativeDate | string;
-  updatedAt: NativeDate | string;
+  email: string;
+  password: string;
   job?: string;
-  department?: Departments;
+  phoneNumber?: string;
+  hasWhatsapp?: boolean;
+  setting?: {
+    geolocation: boolean;
+    notifications: boolean;
+    darkMode: DeviceDarkModeSettings;
+    time24: boolean;
+    language: string;
+  }
 }
-interface ICompanyOwner {
-  _id?: Types.ObjectId | string;
-  name?: string;
-  email?: string;
-}
+
+export interface IAdminDeleteOutput {
+  code: ReturnCodes;
+};
+
+// interface ICompanyOwner {
+//   _id?: Types.ObjectId | string;
+//   name?: string;
+//   email?: string;
+// }
 export interface IOutputWorkspaceMember {
   id?: Types.ObjectId | string;
   permissions?: IOutputWorkspacePermission[];
@@ -49,48 +61,58 @@ export interface IOutputWorkspaceInvitation {
   updatedAt: NativeDate | string;
 }
 
+export interface IOutputDevice {
+  name: string;
+  description?: string;
+  isDefault: boolean;
+  brand?: string;
+  plantedAt?: NativeDate | string;
+  company?: Types.ObjectId | string;
+  workspace?: Types.ObjectId | string;
+  maxPowerOutput?: number;
+  batteryCapacity?: number;
+  panelSize?: number;
+  totalPanel?: number;
+  efficiencyRating?: number;
+  votageOutput?: number;
+  material?: string;
+  warrantyExpiration?: NativeDate | string;
+  inverterType?: string;
+  weatherResistanceRating?: string;
+};
+
 // WORKSPACE
 export interface IOutputWorkspace {
   _id: Types.ObjectId | string;
-  name: string;
-  isDefault: boolean;
-  language: string;
-  timezone: string;
-  ownerId: Types.ObjectId | string;
-  companyId: Types.ObjectId | string;
-  members: IOutputWorkspaceMember[];
-  createdAt: NativeDate | string;
-  updatedAt: NativeDate | string;
+  name?: string;
+  language?: string;
+  timezone?: string;
+  ownerId?: Types.ObjectId | string;
+  members?: IOutputWorkspaceMember[];
+  userAvgDailyConsumption?: number; 
+  calculatedAvgDailyConsumption?: number;
+  avgSunlightPerDay?: number;
+  coordinates?: {
+    latitude?: number;
+    longitude?: number;
+    elevation?: number;
+  };
+  location?: {
+    type?: string;
+    coordinates?: [number, number];
+  };
+  createdAt?: NativeDate | string;
+  updatedAt?: NativeDate | string;
 }
 
-export interface IOutputWorkspacePopulated {
-  _id: Types.ObjectId | string;
-  name: string;
-  isDefault: boolean;
-  language: string;
-  timezone: string;
-  ownerId: Types.ObjectId | string;
-  companyId: Types.ObjectId | string;
-  members: IOutputWorkspaceMember[];
-  createdAt: NativeDate | string;
-  updatedAt: NativeDate | string;
-  _owner: ICompanyOwner;
-  _companyOwner: ICompanyOwner;
-  _members: IOutputWorkspaceMemberPopulated[];
+export interface IOutputWorkspacePopulated extends IOutputWorkspace {
+  _owners?: IUserMinimalModel;
+  _members?: IUserMinimalModel[];
   invitations: IOutputWorkspaceInvitation[];
 }
 
-export interface IOutputWorkspaceList {
-  _id: Types.ObjectId | string;
-  name: string;
-  isDefault: boolean;
-  language: string;
-  timezone: string;
-  ownerId: Types.ObjectId | string;
-  companyId: Types.ObjectId | string;
-  members: IOutputWorkspaceMember[];
-  createdAt: NativeDate | string;
-  updatedAt: NativeDate | string;
+export interface IOutputWorkspaceList extends IOutputWorkspace  {
   invitationCount?: number;
-  companyName: string;
+  deviceCount?: number;
+  totalPanelCapacity?: number;
 }

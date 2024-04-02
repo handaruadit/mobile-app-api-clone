@@ -21,13 +21,12 @@ export default (routePermissions: RoutePermissions) =>
       key as keyof RoutePermissions
     ] as PermissionItem;
     if (selectedRoutePermissions) {
-      const { entity, permissions, onlyCompanyOwner, onlyWorkspaceOwner } =
+      const { entity, permissions, onlyWorkspaceOwner } =
         selectedRoutePermissions;
       const hasPermission = checkJWTPermissions({
         jwt: req.jwt,
         entity,
         permissions,
-        onlyCompanyOwner,
         onlyWorkspaceOwner
       });
 

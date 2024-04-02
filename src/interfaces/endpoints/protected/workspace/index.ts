@@ -1,9 +1,10 @@
 import {
-  IOutputWorkspace,
   IOutputWorkspacePopulated,
-  IOutputWorkspaceList
+  IOutputWorkspaceList,
+  IOutputWorkspace
 } from '@/interfaces/entities';
 import { ReturnCodes } from '@/lib/enum';
+import { IOutputWorkspacePermission } from '@/types';
 
 // LIST
 export interface OutputProtectedWorkspaceList {
@@ -18,19 +19,32 @@ export interface OutputProtectedWorkspaceGet {
 // POST
 export interface InputProtectedWorkspacePostBody {
   name: string;
-  language: string;
-  timezone: string;
+  coordinates?: {
+    latitude?: number;
+    longitude?: number;
+    elevation?: number;
+  };
+  location?: {
+    type?: string;
+    coordinates?: [number, number];
+  };
+  language?: string;
+  timezone?: string;
+  userAvgDailyConsumption?: number;
+  avgSunlightPerDay?: number;
+  plnPricePerKwh?: number;
+  members?: {
+    id?: string;
+    permissions?: IOutputWorkspacePermission[];
+  }[];
+}
+
+export interface InputProtectedWorkspacePutBody extends InputProtectedWorkspacePostBody {
+  ownerId?: string;
 }
 
 export interface OutputProtectedWorkspacePost {
   workspace: IOutputWorkspace;
-}
-
-// PUT
-export interface InputProtectedWorkspacePutBody {
-  name?: string;
-  language?: string;
-  timezone?: string;
 }
 
 export interface OutputProtectedWorkspacePut {

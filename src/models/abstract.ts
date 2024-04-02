@@ -20,7 +20,7 @@ export default class Abdstract {
 
   populate = (query: Query<any, any>) => query;
 
-  get = async <T>(id: string, populate?: boolean): Promise<T | undefined> => {
+  get = async <T>(id: Types.ObjectId | string, populate?: boolean): Promise<T | undefined> => {
     const query = this.model.findById(id);
 
     const populated = populate ? this.populate(query) : query;
@@ -37,12 +37,18 @@ export default class Abdstract {
     field = 'createdAt',
     order = 'descending',
     limit?: number,
-    populate?: boolean
+    populate?: boolean,
+    skip?: number,
+    select?: string
   ): Promise<T[]> => {
     let query = this.model
       .find(filter)
+      .select(select) // Add only certain field filter
       // @ts-ignore
       .sort({ [field]: order, createdAt: 'descending' });
+    if (skip) {
+      query = query.skip(skip);
+    }
 
     if (limit) {
       query = query.limit(limit);
@@ -97,6 +103,20 @@ export default class Abdstract {
 
   validate = () => {
     return true;
+  };
+
+  paginatedFind = async <T>(
+    filter: FilterQuery<any>,
+    field = 'createdAt',
+    order = 'descending',
+    limit?: number,
+    populate?: boolean,
+    skip?: number
+  ): Promise<[number, T[]]> => {
+    return Promise.all([
+      this.model.count(filter),
+      this.find<T>(filter, field, order, limit, populate, skip)
+    ]);
   };
 }
 

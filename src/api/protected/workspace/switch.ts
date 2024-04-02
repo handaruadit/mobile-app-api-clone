@@ -3,11 +3,9 @@ import { isValidObjectId } from 'mongoose';
 import {
   workspace as entity,
   user as entityUser,
-  company as entityCompany
 } from '@/models';
 import { IUserModelWithId } from '@/models/user';
 import { IWorkspaceModelWithId as IEntityModel } from '@/models/workspace';
-import { ICompanyModelWithId } from '@/types';
 
 import { OutputProtectedWorkspaceSwitchPut } from '@/interfaces/endpoints/protected/workspace/switch';
 import { Entities, ErrorCodes, Roles } from '@/lib/enum';
@@ -67,18 +65,18 @@ export default () =>
         return;
       }
 
-      const [company] = await entityCompany.find<ICompanyModelWithId>({
-        _id: item.companyId
-      });
+      // const [company] = await entityCompany.find<ICompanyModelWithId>({
+      //   _id: item.companyId
+      // });
 
-      if (!company) {
-        Exception.notFound(res, ErrorCodes.COMPANY_NOT_FOUND);
-        return;
-      }
+      // if (!company) {
+      //   Exception.notFound(res, ErrorCodes.COMPANY_NOT_FOUND);
+      //   return;
+      // }
 
       // User already exist
       const userAlreadyExistInWorkspace =
-        company.ownerId?.equals(userId) ||
+        // company.ownerId?.equals(userId) ||
         item.ownerId?.equals(userId) ||
         item.members?.some(({ id }) => id?.equals(userId));
 

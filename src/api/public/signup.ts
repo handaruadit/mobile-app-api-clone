@@ -7,6 +7,8 @@ import { encryptPassword } from '@/lib/encode';
 import { generateJwtTokens } from '@/lib/jwt';
 import resource from '@/middleware/resource-router-middleware';
 import exception from '@/lib/exception';
+import isLength from 'validator/lib/isLength';
+import { ReturnCodes } from '@/types';
 
 export default () =>
   resource({
@@ -37,7 +39,14 @@ export default () =>
           password,
           name
         }: { email: string; password: string; name: string } = body;
-  
+        // simple check
+        const isLong = isLength(password, { min: 6 });
+
+        if (!isLong) {
+          exception.notValid(res, ReturnCodes.PASSWORD_NOT_LONG_ENOUGH);
+          return;
+        }
+
         const payload = {
           email,
           password: await encryptPassword(password),

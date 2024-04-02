@@ -14,8 +14,8 @@ export interface OutputError {
 
 export interface JWTDecodedOutput {
   iss?: string;
-  id: string;
-  email: string;
+  id?: string;
+  email?: string;
   company?: {
     id: string;
     owner: boolean;
@@ -25,6 +25,7 @@ export interface JWTDecodedOutput {
     owner: boolean;
   };
   permissions?: Record<string, string>[];
+  deviceId?: string;
 }
 
 export interface IOutputWorkspacePermission {

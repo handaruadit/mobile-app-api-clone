@@ -67,7 +67,7 @@ export const isTokenValid = async (
 
   const account = {
     ...acc,
-    companyId: workspacesOfUser?.companyId?.toString(),
+    // companyId: workspacesOfUser?.companyId?.toString(),
     workspaceId: workspacesOfUser?._id?.toString()
   };
 

@@ -1,4 +1,5 @@
 import { model, Schema } from 'mongoose';
+import moment from 'moment-timezone';
 import type { InferSchemaType, Types, Model } from 'mongoose';
 
 import Abstract from '@/models/abstract';
@@ -10,27 +11,30 @@ const schema = new Schema(
     siteId: {
       type: String, // should be type: Schema.Types.ObjectId in the future.
     },
-    inverterId:  {
-      type: String, // should be type: Schema.Types.ObjectId in the future.
+    deviceId:  {
+      type: Schema.Types.ObjectId,
+      required: true,
+      // required: [true, ValidationErrorCodes.WORKSPACE_IS_REQUIRED],
+      ref: 'Device',
     },
     metadata: Object,
     panelVoltage: {
-      type: Number,
+      type: Number, // unit: volts
     },
     batteryVoltage:  {
-      type: Number,
+      type: Number, // unit: volts
     },
     panelCurrent:  {
-      type: Number,
+      type: Number, // unit: amperes
     },
     batteryCurrent:  {
-      type: Number,
+      type: Number, // unit: amperes
     },
     panelPower:  {
-      type: Number,
+      type: Number, // unit: watts
     },
     batteryPower:  {
-      type: Number,
+      type: Number, // unit: watts
     },
     timezone: {
       type: String,
@@ -61,7 +65,7 @@ const schema = new Schema(
     timeseries: {
       timeField: 'sentAt',
       metaField: 'metadata',
-      granularity: 'minutes',
+      granularity: 'seconds',
     }
   }
 );
@@ -88,6 +92,42 @@ class MongooseModel extends Abstract {
   defineModel = () => {
     this.model = model('InverterData', schema);
   };
+
+  /**
+   * 
+   * @param deviceIds 
+   * @param days days 0 means it's only today
+   * @param timezone 
+   * @returns 
+   */
+  getMainStats = async (deviceIds: string[] | Types.ObjectId[],  days: number, timezone: string = 'UTC') => {
+    const todayStart = moment().tz(timezone).subtract(days, 'days').startOf('day');
+    
+    const pipeline = [
+      {
+        $match: {
+          sentAt: { $gte: todayStart.toDate() },
+          deviceId: { $in: deviceIds }
+        }
+      },
+      {
+        $group: {
+          _id: null,
+          totalYield: { $sum: { $add: ["$panelPower", "$batteryPower"] } },
+          todayConsumption: { $sum: { $add: ["$panelPower", "$batteryPower" ] } },
+          totalCharging: { $sum: "$batteryPower" },
+          totalPowerUsage: { $sum: "$panelPower" }
+        }
+      }
+    ];
+
+    return await this.model.aggregate(pipeline);
+  }
+
+  // TODO
+  getTimeseriesData = async (deviceIds: string[] | Types.ObjectId[],  days: number, timezone: string = 'UTC') => {
+
+  }
 
   // populate = (query: Query<any, any>) =>
   //   query

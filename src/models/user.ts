@@ -3,7 +3,7 @@ import type { Types, Model } from 'mongoose';
 import isEmail from 'validator/lib/isEmail';
 
 import { StringIds } from '@/interfaces/common';
-import { Departments, ValidationErrorCodes } from '@/lib/enum';
+import { DeviceDarkModeSettings, ValidationErrorCodes } from '@/lib/enum';
 
 import Abstract from './abstract';
 
@@ -27,13 +27,30 @@ const schema = new Schema(
       minlength: [6, ValidationErrorCodes.PASSWORD_TOO_SHORT]
     },
     job: { type: String, minLength: [2, ValidationErrorCodes.JOB_TOO_SHORT] },
-    department: {
+    phoneNumber: {
       type: String,
-      enum: {
-        values: Object.values(Departments),
-        message: ValidationErrorCodes.INVALID_DEPARTMENT
+      required: false,
+      validate: {
+        validator: (v: string) => /^\d{10,15}$/.test(v),
+        message: ValidationErrorCodes.INVALID_PHONE_NUMBER
       }
-    }
+    },
+    hasWhatsapp: { type: Boolean, default: false },
+    setting: {
+      geolocation: { type: Boolean, default: false },
+      notifications: { type: Boolean, default: false },
+      darkMode: {
+        type: String,
+        default: DeviceDarkModeSettings.AUTO,
+        enum: Object.values(DeviceDarkModeSettings)
+      },
+      time24: { type: Boolean, default: false },
+      language: {
+        type: String,
+        default: 'id'
+      }
+    },
+    isAdmin: Boolean
   },
   { timestamps: true }
 );
@@ -43,6 +60,13 @@ export type IUserModelWithId = IUserModel & {
   _id: Types.ObjectId;
 };
 export type IUserModelOutput = StringIds<IUserModelWithId>;
+export type IUserModelPayload = Omit<IUserModelOutput, 'createdAt' | 'updatedAt'>;
+
+export interface IUserMinimalModel {
+  _id: Types.ObjectId | string;
+  name: string;
+  email: string;
+}
 
 class MongooseModel extends Abstract {
   declare model: Model<IUserModel>;

@@ -116,12 +116,10 @@ export default () =>
 
       const payloadWorkspace: IWorkspaceModelPayload = {
         name: company.name,
-        isDefault: true,
         language: 'en',
         timezone: 'UTC',
         members: [],
-        ownerId: account._id,
-        companyId: company._id
+        ownerId: account._id
       };
 
       await workspaceEntity.create<IEntityModelWorkspace>(payloadWorkspace);

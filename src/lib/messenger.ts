@@ -52,7 +52,7 @@ class Messenger {
         // Send acknowledgment
         const saving = await inverterData.create({
           siteId: payload.site_id,
-          inverterId: payload.inverter_id,
+          deviceId: payload.inverter_id,
           metadata: payload.metadata,
           panelVoltage: payload.panel_voltage,
           batteryVoltage: payload.battery_voltage,

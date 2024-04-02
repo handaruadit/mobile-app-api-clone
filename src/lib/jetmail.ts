@@ -8,25 +8,25 @@ const FROM_NAME = 'Ardhi from Batari';
 const TEMPLATES = {
   WELCOME: {
     id: 4743287,
-    subject: () => '[Displayeo] Welcome to Displayeo'
+    subject: () => '[Batari] Welcome to Batari'
   },
   FORGOT_PASSWORD: {
     id: 5102686,
-    subject: () => '[Displayeo] Reset your password'
+    subject: () => '[Batari] Reset your password'
   },
   RESET_PASSWORD: {
     id: 5102711,
-    subject: () => '[Displayeo] Your password successfully reset'
+    subject: () => '[Batari] Your password successfully reset'
   },
   INVITATION_SIGNUP: {
     id: 5102734,
     subject: (companyName: string) =>
-      `[Displayeo] Signup and join ${companyName}`
+      `[Batari] Signup and join ${companyName}`
   },
   WORKSPACE_OWNERSHIP: {
     id: 5102787,
     subject: (workspaceName: string) =>
-      `[Displayeo] You are now the manager of ${workspaceName}`
+      `[Batari] You are now the manager of ${workspaceName}`
   }
 };
 

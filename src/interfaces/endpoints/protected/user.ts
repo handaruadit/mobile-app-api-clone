@@ -1,8 +1,8 @@
-import { Departments, IProtectedUserEntity } from '@/types';
+import { DeviceDarkModeSettings, IBaseUserEntity } from '@/types';
 
 // LIST
 export interface OutputProtectedUserList {
-  user: IProtectedUserEntity;
+  user: IBaseUserEntity;
 }
 
 // PUT
@@ -10,8 +10,17 @@ export interface InputProtectedUserPutBody {
   email: string;
   name?: string;
   job?: string;
-  department?: Departments;
+  password?: string;
+  phoneNumber?: string;
+  hasWhatsapp?: boolean;
+  setting?: {
+    geolocation?: boolean;
+    notifications?: boolean;
+    darkMode?: DeviceDarkModeSettings;
+    time24?: boolean;
+    language?: string;
+  }
 }
 export interface OutputProtectedUserPut {
-  user: IProtectedUserEntity;
+  user: IBaseUserEntity;
 }

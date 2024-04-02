@@ -17,23 +17,23 @@ import {
   OutputProtectedWorkspaceUserPut
 } from '@/interfaces/endpoints/protected/workspace/user';
 import { randomToken } from '@/lib/encode';
-import { Entities, ErrorCodes, ReturnCodes, Roles } from '@/lib/enum';
+import { ErrorCodes, ReturnCodes } from '@/lib/enum';
 import Exception from '@/lib/exception';
 import { sendInvitationSignUpEmail } from '@/lib/jetmail';
 import resource from '@/middleware/resource-router-middleware';
 
 export default () =>
   resource({
-    permissions: {
-      put: {
-        entity: Entities.WORKSPACE,
-        permissions: [Roles.ADMIN, Roles.WRITE]
-      },
-      delete: {
-        entity: Entities.WORKSPACE,
-        permissions: [Roles.ADMIN]
-      }
-    },
+  //   permissions: {
+  //     put: {
+  //       entity: Entities.WORKSPACE,
+  //       permissions: [Roles.ADMIN, Roles.WRITE]
+  //     },
+  //     delete: {
+  //       entity: Entities.WORKSPACE,
+  //       permissions: [Roles.ADMIN]
+  //     }
+  //   },
 
     /**
      * @openapi
@@ -80,11 +80,6 @@ export default () =>
       });
       if (!workspaceCurrent) {
         Exception.notFound(res, ErrorCodes.WORKSPACE_NOT_FOUND);
-        return;
-      }
-
-      if (!workspaceCurrent.companyId?.equals(workspaceCompany._id)) {
-        Exception.unauthorized(res, ErrorCodes.USER_NOT_AUTHORIZED);
         return;
       }
 
@@ -147,14 +142,8 @@ export default () =>
         ]
       });
 
-      // check if User is already member of another workspaces
-      const hasAllWorkspacesInCompany = workspacesOfUser.every(
-        (workspace) =>
-          workspace.companyId?.toString() === workspaceCompany._id.toString()
-      );
-
       // User already member of another workspaces but not all in the same company
-      if (!hasAllWorkspacesInCompany && workspacesOfUser.length > 0) {
+      if (workspacesOfUser.length > 0) {
         Exception.conflict(res, ErrorCodes.USER_ALREADY_IN_OTHER_COMPANY);
         return;
       }

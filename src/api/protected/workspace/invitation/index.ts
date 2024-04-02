@@ -3,26 +3,26 @@ import { isValidObjectId } from 'mongoose';
 import { tokenInvitation as tokenInvit } from '@/models';
 import { ITokenInvitationModelWithId } from '@/models/tokenInvitation';
 
-import { Entities, ErrorCodes, ReturnCodes, Roles } from '@/lib/enum';
+import { ErrorCodes, ReturnCodes } from '@/lib/enum';
 import Exception from '@/lib/exception';
 import resource from '@/middleware/resource-router-middleware';
 
 export default () =>
   resource({
-    permissions: {
-      list: {
-        entity: Entities.WORKSPACE,
-        permissions: [Roles.ADMIN, Roles.WRITE, Roles.READ]
-      },
-      put: {
-        entity: Entities.WORKSPACE,
-        permissions: [Roles.ADMIN, Roles.WRITE]
-      },
-      delete: {
-        entity: Entities.WORKSPACE,
-        permissions: [Roles.ADMIN, Roles.WRITE]
-      }
-    },
+    // permissions: {
+    //   list: {
+    //     entity: Entities.WORKSPACE,
+    //     permissions: [Roles.ADMIN, Roles.WRITE, Roles.READ]
+    //   },
+    //   put: {
+    //     entity: Entities.WORKSPACE,
+    //     permissions: [Roles.ADMIN, Roles.WRITE]
+    //   },
+    //   delete: {
+    //     entity: Entities.WORKSPACE,
+    //     permissions: [Roles.ADMIN, Roles.WRITE]
+    //   }
+    // },
 
     /**
      * @openapi

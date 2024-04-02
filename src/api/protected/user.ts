@@ -83,8 +83,12 @@ export default () =>
         name: body.name,
         email: body.email,
         job: body.job,
-        department: body.department,
-        _id: item._id
+        _id: item._id,
+        phoneNumber: body.phoneNumber,
+        hasWhatsapp: body.hasWhatsapp,
+        setting: {
+          ...(body.setting ?? {})
+        }
       };
 
       const updatedItem = await entity.update<IEntityModel>(id, payload);

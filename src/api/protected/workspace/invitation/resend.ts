@@ -5,19 +5,19 @@ import { ICompanyModelWithId } from '@/models/company';
 import { ITokenInvitationModelWithId } from '@/models/tokenInvitation';
 
 import { OutputProtectedWorkspaceInvitationResendPut } from '@/interfaces/endpoints/protected/workspace/invitation/resend';
-import { Entities, ErrorCodes, ReturnCodes, Roles } from '@/lib/enum';
+import { ErrorCodes, ReturnCodes } from '@/lib/enum';
 import Exception from '@/lib/exception';
 import { sendInvitationSignUpEmail } from '@/lib/jetmail';
 import resource from '@/middleware/resource-router-middleware';
 
 export default () =>
   resource({
-    permissions: {
-      put: {
-        entity: Entities.WORKSPACE,
-        permissions: [Roles.ADMIN, Roles.WRITE]
-      }
-    },
+    // permissions: {
+    //   put: {
+    //     entity: Entities.WORKSPACE,
+    //     permissions: [Roles.ADMIN, Roles.WRITE]
+    //   }
+    // },
 
     /**
      * @openapi

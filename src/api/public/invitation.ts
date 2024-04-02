@@ -2,11 +2,9 @@ import isLength from 'validator/lib/isLength';
 
 import {
   tokenInvitation as entity,
-  company as entityCompany,
   user as entityUser,
   workspace as entityWorkspace
 } from '@/models';
-import { ICompanyModelWithId } from '@/models/company';
 import { ITokenInvitationModelWithId as IEntityModel } from '@/models/tokenInvitation';
 import { IUserModelWithId } from '@/models/user';
 import { IWorkspaceModelWithId } from '@/models/workspace';
@@ -55,17 +53,17 @@ export default () =>
         return;
       }
 
-      const [company] = await entityCompany.find<ICompanyModelWithId>({
-        _id: workspace.companyId
-      });
-      if (!company) {
-        Exception.notFound(res, ErrorCodes.COMPANY_NOT_FOUND);
-        return;
-      }
+      // const [company] = await entityCompany.find<ICompanyModelWithId>({
+      //   _id: workspace.companyId
+      // });
+      // if (!company) {
+      //   Exception.notFound(res, ErrorCodes.COMPANY_NOT_FOUND);
+      //   return;
+      // }
 
       const result = {
         userEmail: token.userEmail,
-        company: company.name,
+        // company: company.name,
         workspace: workspace.name
       };
 

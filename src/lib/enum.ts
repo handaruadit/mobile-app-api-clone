@@ -29,10 +29,7 @@ export enum Departments {
 }
 
 export enum Entities {
-  WORKSPACE = 'WORKSPACE',
-  SCREENS = 'SCREENS',
-  CONTENT = 'CONTENT',
-  BILLING = 'BILLING'
+  WORKSPACE = 'WORKSPACE'
 }
 
 export enum Roles {
@@ -45,18 +42,22 @@ export enum Roles {
 export enum ErrorCodes {
   COMPANY_NOT_FOUND = 'CompanyNotFound',
   COMPANY_ALREADY_EXISTS = 'CompanyAlreadyExists',
+  DEVICE_NOT_FOUND = 'DeviceNotFound',
   USER_NOT_AUTHORIZED = 'UserNotAuthorized',
   PASSWORD_NOT_MATCH = 'PasswordNotMatch',
   PASSWORD_NOT_VALID = 'PasswordNotValid',
   WORKSPACE_NOT_FOUND = 'WorkspaceNotFound',
+  WORKSPACE_STILL_HAS_SOLAR_PANEL = 'WorkspaceStillHasSolarPanelInIt',
   WORKSPACE_NEW_OWNER_MEMBER = 'NewOwnerMember',
   WORKSPACE_USER_ALREADY_OWNER = 'UserAlreadyOwner',
+  USER_ALREADY_EXISTS = 'UserAlreadyExist',
   USER_NOT_FOUND = 'UserNotFound',
   USER_NOT_FOUND_IN_WORKSPACE = 'UserNotFoundInWorkspace',
   INVITATION_ALREADY_SENT = 'InvitationAlreadySent',
   USER_ALREADY_IN_WORKSPACE = 'UserAlreadyInWorkspace',
   USER_ALREADY_IN_OTHER_COMPANY = 'UserAlreadyInOtherCompany',
   INVITATION_NOT_FOUND = 'InvitationNotFound',
+  INVALID_REQUEST = 'InvalidRequest',
   EMAIL_ALREADY_EXISTS = 'EmailAlreadyExists',
   LINK_NOT_VALID = 'LinkNotValid',
   LINK_NOT_FOUND = 'LinkNotFound',
@@ -95,18 +96,31 @@ export enum ValidationErrorCodes {
   INVALID_COMPANY_ID = 'InvalidCompanyId',
   INVALID_ENTITY = 'InvalidEntity',
   WORKSPACE_IS_REQUIRED = 'WorkspaceIsRequired',
-  USER_ID_IS_REQUIRED = 'UserIdIsRequired'
+  USER_ID_IS_REQUIRED = 'UserIdIsRequired',
+  INVALID_PHONE_NUMBER = 'InvalidPhoneNumber',
+  PHONE_NUMBER_REQUIRED = 'PhoneNumberRequired'
 }
 
 export enum ReturnCodes {
   COMPANY_DELETED = 'CompanyDeleted',
+  DEVICE_DELETED = 'DeviceDeleted',
+  DEVICE_PAIRED = 'DevicePaired',
   WORKSPACE_DELETED = 'WorkspaceDeleted',
+  JOIN_REQUEST_SENT = 'JoinRequestSent',
   INVITATION_SENT = 'InvitationSent',
+  INVALID_COORDINATES = 'InvalidCoordinates',
   USER_ADDED = 'UserAdded',
-  PERMISSIONS_UPDATED = 'PermissionsUpdated',
   USER_REMOVED = 'UserRemoved',
+  PERMISSIONS_UPDATED = 'PermissionsUpdated',
   INVITATION_DELETED = 'InvitationDeleted',
   EMAIL_SENT = 'EmailSent',
   PASSWORD_RESET = 'PasswordReset',
+  PASSWORD_NOT_LONG_ENOUGH = 'PasswordNotLongEnough',
   OWNER_CHANGED = 'OwnerChanged'
+}
+
+export enum DeviceDarkModeSettings {
+  LIGHT = 'light',
+  DARK = 'dark',
+  AUTO = 'auto'
 }

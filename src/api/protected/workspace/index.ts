@@ -1,20 +1,19 @@
-import { isValidObjectId } from 'mongoose';
+import { isValidObjectId, Types } from 'mongoose';
 
 import {
   workspace as entity,
-  company as entityCompany,
-  user as entityUser,
-  tokenInvitation
+  tokenInvitation,
+  device as deviceEntity
 } from '@/models';
-import { ICompanyModelWithId } from '@/models/company';
 import { ITokenInvitationModelWithId } from '@/models/tokenInvitation';
-import { IUserModelWithId as IEntityUser } from '@/models/user';
 import {
   IWorkspaceModelWithId as IEntityModel,
-  IWorkspaceModelPayload as IEntityPayload
+  IWorkspaceModelWithId
 } from '@/models/workspace';
 
 import {
+  InputProtectedWorkspacePostBody,
+  InputProtectedWorkspacePutBody,
   OutputProtectedWorkspaceDelete,
   OutputProtectedWorkspaceGet,
   OutputProtectedWorkspaceList,
@@ -25,21 +24,19 @@ import { Entities, ErrorCodes, ReturnCodes, Roles } from '@/lib/enum';
 import Exception from '@/lib/exception';
 import { checkJWTPermissions } from '@/lib/permission';
 import resource from '@/middleware/resource-router-middleware';
+import { IDeviceModelWithId } from '@/models/device';
 
 export default () =>
   resource({
-    permissions: {
-      post: {
-        onlyCompanyOwner: true
-      },
-      put: {
-        entity: Entities.WORKSPACE,
-        permissions: [Roles.ADMIN]
-      },
-      delete: {
-        onlyWorkspaceOwner: true
-      }
-    },
+    // permissions: {
+    //   put: {
+    //     entity: Entities.WORKSPACE,
+    //     permissions: [Roles.ADMIN]
+    //   },
+    //   delete: {
+    //     onlyWorkspaceOwner: true
+    //   }
+    // },
 
     /**
      * @openapi
@@ -56,11 +53,6 @@ export default () =>
      *            "$ref": "./components.yaml#/components/schemas/OutputProtectedWorkspaceList"
      */
     list: async ({ account, jwt }, res) => {
-      const [isCompanyOwner] = await entityCompany.find<ICompanyModelWithId>({
-        _id: account.companyId,
-        ownerId: account._id
-      });
-
       const pipeline = [
         {
           $match: {
@@ -80,24 +72,16 @@ export default () =>
                     }
                   }
                 }
-              },
-              isCompanyOwner
-                ? { companyId: account.companyId }
-                : { companyId: '_' }
+              }
             ]
           }
         },
         {
           $lookup: {
-            from: 'companies',
-            localField: 'companyId',
-            foreignField: '_id',
-            as: 'company'
-          }
-        },
-        {
-          $match: {
-            'company.0': { $exists: true }
+            from: 'devices',
+            localField: '_id',
+            foreignField: 'workspace',
+            as: 'devices'
           }
         },
         {
@@ -110,7 +94,9 @@ export default () =>
         },
         {
           $addFields: {
-            invitationCount: { $size: '$invitations' }
+            invitationCount: { $size: '$invitations' },
+            deviceCount: { $size: '$devices' },
+            totalPanelCapacity: { $sum: '$devices.panelCapacity' }
           }
         },
         {
@@ -119,12 +105,8 @@ export default () =>
           }
         }
       ];
-
       const workspaces = await entity.model.aggregate<
-        IEntityModel & {
-          invitationCount?: number;
-          company: ICompanyModelWithId[];
-        }
+        IEntityModel & { invitationCount?: number; deviceCount?: number; totalPanelCapacity?: number }
       >(pipeline);
 
       const userHasWritePermission = checkJWTPermissions({
@@ -141,11 +123,7 @@ export default () =>
       }
 
       res.json({
-        workspaces: workspaces.map((el) => ({
-          ...el,
-          company: undefined,
-          companyName: el.company?.[0]?.name
-        }))
+        workspaces
       } satisfies OutputProtectedWorkspaceList);
       return;
     },
@@ -181,10 +159,10 @@ export default () =>
       const isMemberOrOwner =
         // @ts-ignore
         workspace.members.some((el) => el?.id?.equals(account._id)) ||
-        workspace._owner?._id.equals(account._id);
+        (workspace._owner?._id as Types.ObjectId).equals(account._id);
 
       if (!isMemberOrOwner) {
-        Exception.notFound(res, ErrorCodes.WORKSPACE_NOT_FOUND);
+        Exception.notFound(res, ErrorCodes.USER_NOT_AUTHORIZED);
         return;
       }
 
@@ -211,22 +189,8 @@ export default () =>
           workspaceId: id
         });
 
-      const [company] = await entityCompany.find<ICompanyModelWithId>({
-        _id: workspace.companyId
-      });
-
-      const [user] = await entityUser.find<IEntityUser>({
-        _id: company.ownerId
-      });
-
-      const _companyOwner = {
-        _id: user._id,
-        name: user.name,
-        email: user.email
-      };
-
       res.json({
-        workspace: { ...workspace, invitations, _companyOwner }
+        workspace: { ...workspace, invitations }
       } satisfies OutputProtectedWorkspaceGet);
       return;
     },
@@ -252,24 +216,22 @@ export default () =>
      *            "$ref": "./components.yaml#/components/schemas/OutputProtectedWorkspacePost"
      */
     post: async ({ account, body }, res) => {
-      const { name, language, timezone } = body;
-
-      const [workspaceCompany] = await entityCompany.find<ICompanyModelWithId>({
-        ownerId: account._id
-      });
-
-      if (!workspaceCompany) {
-        Exception.notFound(res, ErrorCodes.COMPANY_NOT_FOUND);
-        return;
-      }
-
-      const payload: IEntityPayload = {
-        name,
-        language,
-        timezone,
-        isDefault: false,
+      const data = body as InputProtectedWorkspacePostBody;
+      const payload = {
+        name: data.name,
+        language: data.language,
+        timezone: data.timezone,
         ownerId: account._id,
-        companyId: workspaceCompany._id
+        coordinates: data.coordinates ? {
+          latitude: data.coordinates.latitude,
+          longitude: data.coordinates.longitude,
+          elevation: data.coordinates.elevation
+        } : undefined,
+        location:  data.coordinates ? {
+          type: 'Point',
+          coordinates: [body.coordinates.longitude, body.coordinates.latitude]
+        } : undefined,
+        members: data.members
       };
       const workspace = await entity.create<IEntityModel>(payload);
 
@@ -297,7 +259,7 @@ export default () =>
      *          schema:
      *            "$ref": "./components.yaml#/components/schemas/OutputProtectedWorkspacePut"
      */
-    put: async ({ body, params }, res) => {
+    put: async ({ account, body, params }, res) => {
       const { id } = params;
 
       if (!isValidObjectId(id)) {
@@ -305,11 +267,31 @@ export default () =>
         return;
       }
 
-      const payload: IEntityPayload = {
-        ...body
-      };
+      const [checkOwnership] = await entity.findWorkspacesOfUser(account._id);
 
-      if (payload.ownerId) delete payload.ownerId;
+      if (!checkOwnership) {
+        Exception.notValid(res, ErrorCodes.USER_NOT_AUTHORIZED);
+        return;
+      }
+
+      
+      if (body.ownerId) delete body.ownerId;
+
+      const payload: InputProtectedWorkspacePutBody = {
+        name: body.name,
+        language: body.language,
+        timezone: body.timezone,
+        coordinates: body.coordinates ? {
+          latitude: body.coordinates.latitude,
+          longitude: body.coordinates.longitude,
+          elevation: body.coordinates.elevation
+        } : undefined,
+        location: {
+          type: 'Point',
+          coordinates: [body.coordinates.longitude, body.coordinates.latitude]
+        },
+        members: body.members
+      };
 
       const workspace = await entity.update<IEntityModel>(id, payload);
 
@@ -330,11 +312,27 @@ export default () =>
      *          schema:
      *            "$ref": "./components.yaml#/components/schemas/OutputProtectedWorkspaceUserDelete"
      */
-    delete: async ({ params }, res) => {
+    delete: async ({ account, params }, res) => {
       const { id } = params;
 
       if (!isValidObjectId(id)) {
         Exception.notValid(res, ErrorCodes.VALIDATION_ERROR);
+        return;
+      }
+
+      const [checkOwnership] = await entity.find<IWorkspaceModelWithId>({
+        ownerId: account._id   
+      });
+
+      if (!checkOwnership) {
+        Exception.notValid(res, ErrorCodes.USER_NOT_AUTHORIZED);
+        return;
+      }
+
+      // check if has device
+      const devices = await deviceEntity.find<IDeviceModelWithId>({ workspace: id });
+      if (devices && devices.length > 0) {
+        Exception.notFound(res, ErrorCodes.WORKSPACE_STILL_HAS_SOLAR_PANEL);
         return;
       }
 

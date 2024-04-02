@@ -1,4 +1,4 @@
-import { IProtectedUserEntity } from '@/interfaces/entities';
+import { IBaseUserEntity } from '@/interfaces/entities';
 
 // PUT
 export interface InputProtectedPasswordPutBody {
@@ -6,5 +6,5 @@ export interface InputProtectedPasswordPutBody {
   newPassword: string;
 }
 export interface OutputProtectedPasswordPut {
-  user: IProtectedUserEntity;
+  user: IBaseUserEntity;
 }
