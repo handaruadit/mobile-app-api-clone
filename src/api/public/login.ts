@@ -43,17 +43,17 @@ export default () =>
         return;
       }
 
-      const [alreadyExists] = await entity.find<IUserModelWithId>({
+      const [userData] = await entity.find<IUserModelWithId>({
         email
       });
 
-      if (!alreadyExists) {
+      if (!userData) {
         Exception.notFound(res, ErrorCodes.USER_NOT_FOUND);
         return;
       }
       const match = await comparePassword({
         password,
-        encryptedPassword: alreadyExists.password
+        encryptedPassword: userData.password
       });
 
       if (!match) {
@@ -62,16 +62,16 @@ export default () =>
       }
 
       // const [company] = await entityCompany.find<ICompanyModelWithId>({
-      //   ownerId: alreadyExists._id
+      //   ownerId: userData._id
       // });
 
-      // if (!alreadyExists.crispTokenId) {
+      // if (!userData.crispTokenId) {
       //   try {
       //     const uuid = UUIDV4();
-      //     await entity.update<IUserModelWithId>(alreadyExists._id, {
+      //     await entity.update<IUserModelWithId>(userData._id, {
       //       crispTokenId: uuid
       //     });
-      //     alreadyExists.crispTokenId = uuid;
+      //     userData.crispTokenId = uuid;
       //   } catch (err) {
       //     /** avoid throw an error to client only because of Crisp. May need a better error handling */
       //     console.error('Failed to assign crispTokenId');
@@ -79,7 +79,7 @@ export default () =>
       // }
 
       const tokens = await generateJwtTokens({
-        user: alreadyExists
+        user: userData
       });
 
       res.status(200).json({ tokens } satisfies OutputPublicLoginPost);

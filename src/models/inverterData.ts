@@ -53,11 +53,10 @@ const schema = new Schema(
     isOnline: {
       type: Boolean
     },
-    receivedAt: {
-      type: Date
-    },
     sentAt: {
-      type: Date
+      type: Date,
+      required: true,
+      default: new Date()
     },
   },
   {
@@ -125,8 +124,21 @@ class MongooseModel extends Abstract {
   }
 
   // TODO
-  getTimeseriesData = async (deviceIds: string[] | Types.ObjectId[],  days: number, timezone: string = 'UTC') => {
-
+  getTimeseriesData = async (deviceIds: string[] | Types.ObjectId[], hours?: number, timezone: string = 'UTC') => {
+    const filterDate = moment().tz(timezone).subtract(hours, 'hours').toDate();
+    
+    return await this.find<IInverterDataModelWithId>(
+      {
+        sentAt: { $gte: filterDate },
+        deviceId: { $in: deviceIds }
+      },
+      'sentAt',
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      'deviceId sentAt panelCurrent panelPower panelVoltage batteryPower batteryCurrent batteryVoltage createdAt'
+    );
   }
 
   // populate = (query: Query<any, any>) =>

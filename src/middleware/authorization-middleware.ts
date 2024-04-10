@@ -10,12 +10,13 @@ export default async (req: Request, res: Response, next: NextFunction) => {
   const isRefreshTokenPath = req.url.indexOf('/protected/refresh') !== -1;
 
   if (isAdminProtected) {
-    const isUserAdmin = isAdmin(req.headers);
+    const [isUserAdmin, account] = await isAdmin(req.headers);
 
-    if (!isUserAdmin) {
+    if (!isUserAdmin || !account) {
       Exception.unauthorized(res);
       return;
     }
+    req.account = account;
   } else if (isRefreshTokenPath) {
     try {
       const { account, jwt } =

@@ -62,7 +62,8 @@ export const generateJwtToken = ({
   const payload: JWTDecodedOutput = {
     iss: 'batari',
     id: user._id.toString(),
-    email: user.email?.toString() ?? ''
+    email: user.email?.toString() ?? '',
+    super: user.isAdmin
   };
 
   const expiresIn = type === 'access' ? '1800s' : '7d';

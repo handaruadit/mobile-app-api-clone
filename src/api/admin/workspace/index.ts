@@ -2,13 +2,14 @@ import { Request } from 'express';
 
 import { workspace as entity, user as userEntity } from '@/models';
 import { IWorkspaceModelWithId } from '@/models/workspace';
+import { IUserModelWithId } from '@/models/user';
 
 import { ErrorCodes, ReturnCodes } from '@/lib/enum';
 import Exception from '@/lib/exception';
 import resource from '@/middleware/resource-router-middleware';
 import { isInvalidPaginateParams, isValidLatLong } from '@/lib/util';
 import { IAdminListWorkspaceOutput, IAdminPostWorkspaceBody } from '@/interfaces/endpoints/admin/workspace';
-import { IAdminDeleteOutput, IUserModelWithId } from '@/types';
+import { IAdminDeleteOutput } from '@/types';
 
 export default () =>
   resource({

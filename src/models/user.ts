@@ -36,6 +36,7 @@ const schema = new Schema(
       }
     },
     hasWhatsapp: { type: Boolean, default: false },
+    isAdmin: { type: Boolean, default: false },
     setting: {
       geolocation: { type: Boolean, default: false },
       notifications: { type: Boolean, default: false },
@@ -50,7 +51,6 @@ const schema = new Schema(
         default: 'id'
       }
     },
-    isAdmin: Boolean
   },
   { timestamps: true }
 );
@@ -61,12 +61,6 @@ export type IUserModelWithId = IUserModel & {
 };
 export type IUserModelOutput = StringIds<IUserModelWithId>;
 export type IUserModelPayload = Omit<IUserModelOutput, 'createdAt' | 'updatedAt'>;
-
-export interface IUserMinimalModel {
-  _id: Types.ObjectId | string;
-  name: string;
-  email: string;
-}
 
 class MongooseModel extends Abstract {
   declare model: Model<IUserModel>;

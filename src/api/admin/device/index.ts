@@ -2,8 +2,9 @@ import { Request } from 'express';
 
 import {
   device as entity,
-  workspace as workspaceEntity
+  workspace as workspaceEntity,
 } from '@/models';
+import { IUserModelWithId } from '@/models/user';
 import { IDeviceModelWithId } from '@/models/device';
 
 import { ErrorCodes, ReturnCodes } from '@/lib/enum';
@@ -11,7 +12,7 @@ import Exception from '@/lib/exception';
 import resource from '@/middleware/resource-router-middleware';
 import { isInvalidPaginateParams } from '@/lib/util';
 import { IAdminListDeviceOutput, IAdminPostDeviceBody } from '@/interfaces/endpoints/admin/device';
-import { IAdminDeleteOutput, IUserModelWithId } from '@/types';
+import { IAdminDeleteOutput } from '@/types';
 
 export default () =>
   resource({

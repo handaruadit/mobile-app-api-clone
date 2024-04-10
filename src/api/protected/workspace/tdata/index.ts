@@ -9,7 +9,7 @@ import {
 import { ErrorCodes } from '@/lib/enum';
 import Exception from '@/lib/exception';
 import resource from '@/middleware/resource-router-middleware';
-import { OutputProtectedTodayData } from '@/interfaces/endpoints/protected/workspace/data/today';
+import { OutputProtectedTimeseriesData } from '@/interfaces/endpoints/protected/workspace/main-data';
 
 export default () =>
   resource({
@@ -25,9 +25,9 @@ export default () =>
 
     /**
      * @openapi
-     * /protected/workspace/data:
+     * /protected/workspace/tdata:
      *  get:
-     *    description: /workspace get all devices data in all workspaces
+     *    description: /workspace get all devices timeseries data in all workspaces
      *    tags:
      *      - protected
      *    responses:
@@ -35,23 +35,29 @@ export default () =>
      *        content:
      *         application/json:
      *          schema:
-     *            "$ref": "./components.yaml#/components/schemas/OutputProtectedTodayData"
+     *            "$ref": "./components.yaml#/components/schemas/OutputProtectedTimeseriesData"
      */
     list: async ({ account, query }, res) => {
       try {
-        const { fromLastDays = '0' } = query;
-        if (typeof fromLastDays !== 'string') {
+        // 0 days mean only today
+        const { fromLastDays = '0', fromLastHour } = query;
+        if (typeof fromLastDays !== 'string' || (fromLastHour && typeof fromLastHour !== 'string')) {
           Exception.notValid(res, ErrorCodes.INVALID_REQUEST);
           return;
         }
-
         const devices = await deviceEntity.findUsersDevices(account._id);
         const ids = devices.map((device) => device._id);
     
         const parsedDays = parseInt(fromLastDays ?? '0');
         const days = isNaN(parsedDays) ? 0 : parsedDays;
-        const stats = await inverterData.getMainStats(ids, days);
-        res.json(stats[0] satisfies OutputProtectedTodayData);
+        const parsedHours = parseInt(fromLastHour ?? '0');
+        const hours = isNaN(parsedHours) ? 0 : parsedHours;
+        let startFrom = (days+1) * 24;
+        if (hours) {
+          startFrom = hours;
+        }
+        const stats = await inverterData.getTimeseriesData(ids, startFrom);
+        res.json(stats satisfies OutputProtectedTimeseriesData);
       } catch (error) {
         Exception.parseError(res, error);
       }
@@ -69,13 +75,13 @@ export default () =>
      *        content:
      *         application/json:
      *          schema:
-     *            "$ref": "./components.yaml#/components/schemas/OutputProtectedTodayData"
+     *            "$ref": "./components.yaml#/components/schemas/OutputProtectedTimeseriesData"
      */
     read: async ({ params, account, query }, res) => {
       try {
         // workspace id
-        const { fromLastDays = '0' } = query;
-        if (typeof fromLastDays !== 'string') {
+        const { fromLastDays = '0', fromLastHour } = query;
+        if (typeof fromLastDays !== 'string' || (fromLastHour && typeof fromLastHour !== 'string')) {
           Exception.notValid(res, ErrorCodes.INVALID_REQUEST);
           return;
         }
@@ -96,9 +102,15 @@ export default () =>
 
         const parsedDays = parseInt(fromLastDays ?? '0');
         const days = isNaN(parsedDays) ? 0 : parsedDays;
-        const stats = await inverterData.getMainStats(deviceIds, days);
+        // const parsedHours = parseInt(fromLastHour ?? '0');
+        // const hours = isNaN(parsedHours) ? 0 : parsedHours;
+        // let startFrom = (days+1) * 24;
+        // if (hours) {
+        //   startFrom = hours;
+        // }
+        const stats = await inverterData.getTimeseriesData(deviceIds, days);
 
-        res.json(stats[0] satisfies OutputProtectedTodayData);
+        res.json(stats satisfies OutputProtectedTimeseriesData);
       } catch (error) {
         Exception.parseError(res, error);
       } 

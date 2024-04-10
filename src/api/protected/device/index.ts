@@ -5,12 +5,13 @@ import {
   workspace as workspaceEntity
 } from '@/models';
 import { IDeviceModelWithId } from '@/models/device';
+import { IWorkspaceModelWithId } from '@/models/workspace';
 
 import { ErrorCodes, ReturnCodes, Roles } from '@/lib/enum';
 import Exception from '@/lib/exception';
 import resource from '@/middleware/resource-router-middleware';
 import { isInvalidPaginateParams } from '@/lib/util';
-import { IAdminDeleteOutput, IProtectedListDeviceOutput,  IProtectedPostDeviceBody, IWorkspaceModelWithId } from '@/types';
+import { IAdminDeleteOutput, IProtectedListDeviceOutput,  IProtectedPostDeviceBody } from '@/types';
 
 export default () =>
   resource({

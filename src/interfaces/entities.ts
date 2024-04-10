@@ -1,8 +1,14 @@
 import { Types } from 'mongoose';
 
-import { DeviceDarkModeSettings, IOutputWorkspacePermission, IUserMinimalModel, ReturnCodes } from '@/types';
+import { DeviceDarkModeSettings, IOutputWorkspacePermission, ReturnCodes } from '@/types';
 
 // USER
+export interface IUserMinimalModel {
+  _id: Types.ObjectId | string;
+  name: string;
+  email: string;
+}
+
 export interface IBaseUserEntity {
   _id: Types.ObjectId | string;
   name?: string;
@@ -115,4 +121,18 @@ export interface IOutputWorkspaceList extends IOutputWorkspace  {
   invitationCount?: number;
   deviceCount?: number;
   totalPanelCapacity?: number;
+}
+
+export interface IProtectedInverterData {
+  sentAt: Date | string;
+  createdAt: Date | string; // also means received at
+  isOnline?: boolean;
+  deviceId?: Types.ObjectId | string;
+  metadata?: any;
+  panelVoltage?: number;
+  batteryVoltage?: number;
+  panelCurrent?: number;
+  batteryCurrent?: number;
+  panelPower?: number;
+  batteryPower?: number;
 }

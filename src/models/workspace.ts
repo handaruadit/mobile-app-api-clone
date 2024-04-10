@@ -8,8 +8,7 @@ import { model, Schema, isValidObjectId } from 'mongoose';
 import type { InferSchemaType, Types, Model, Query } from 'mongoose';
 
 import Abstract from '@/models/abstract';
-import { IUserMinimalModel } from '@/models/user';
-
+import { IUserMinimalModel } from '@/types';
 import { StringIds } from '@/interfaces/common';
 import { Entities, Roles, ValidationErrorCodes } from '@/lib/enum';
 
@@ -35,7 +34,6 @@ const schema = new Schema(
     },
     language: {
       type: String,
-      required: [true, ValidationErrorCodes.LANGUAGE_REQUIRED]
     },
     timezone: {
       type: String,

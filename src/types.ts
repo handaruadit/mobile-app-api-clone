@@ -6,11 +6,11 @@ export * from './interfaces/output';
 export * from './interfaces/entities';
 
 // MODELS
-export * from './models/company';
-export * from './models/tokenInvitation';
-export * from './models/tokenPassword';
-export * from './models/user';
-export * from './models/workspace';
+// export * from './models/company';
+// export * from './models/tokenInvitation';
+// export * from './models/tokenPassword';
+// export * from './models/user';
+// export * from './models/workspace';
 
 // ADMIN
 export * from './interfaces/endpoints/admin/user';
@@ -37,6 +37,7 @@ export * from './interfaces/endpoints/protected/workspace/switch';
 export * from './interfaces/endpoints/protected/workspace/user';
 export * from './interfaces/endpoints/protected/device';
 export * from './interfaces/endpoints/protected/workspace';
+export * from './interfaces/endpoints/protected/workspace/main-data';
 
 // RUNNER
 export * from './interfaces/endpoints/runner/workspace';

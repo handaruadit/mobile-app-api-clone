@@ -9,7 +9,7 @@ import {
 import { ErrorCodes } from '@/lib/enum';
 import Exception from '@/lib/exception';
 import resource from '@/middleware/resource-router-middleware';
-import { OutputProtectedTodayData } from '@/interfaces/endpoints/protected/workspace/data/today';
+import { OutputProtectedData } from '@/interfaces/endpoints/protected/workspace/main-data';
 
 export default () =>
   resource({
@@ -35,7 +35,7 @@ export default () =>
      *        content:
      *         application/json:
      *          schema:
-     *            "$ref": "./components.yaml#/components/schemas/OutputProtectedTodayData"
+     *            "$ref": "./components.yaml#/components/schemas/OutputProtectedData"
      */
     list: async ({ account, query }, res) => {
       try {
@@ -51,7 +51,7 @@ export default () =>
         const parsedDays = parseInt(fromLastDays ?? '0');
         const days = isNaN(parsedDays) ? 0 : parsedDays;
         const stats = await inverterData.getMainStats(ids, days);
-        res.json(stats[0] satisfies OutputProtectedTodayData);
+        res.json(stats[0] satisfies OutputProtectedData);
       } catch (error) {
         Exception.parseError(res, error);
       }
@@ -69,7 +69,7 @@ export default () =>
      *        content:
      *         application/json:
      *          schema:
-     *            "$ref": "./components.yaml#/components/schemas/OutputProtectedTodayData"
+     *            "$ref": "./components.yaml#/components/schemas/OutputProtectedData"
      */
     read: async ({ params, account, query }, res) => {
       try {
@@ -98,7 +98,7 @@ export default () =>
         const days = isNaN(parsedDays) ? 0 : parsedDays;
         const stats = await inverterData.getMainStats(deviceIds, days);
 
-        res.json(stats[0] satisfies OutputProtectedTodayData);
+        res.json(stats[0] satisfies OutputProtectedData);
       } catch (error) {
         Exception.parseError(res, error);
       } 

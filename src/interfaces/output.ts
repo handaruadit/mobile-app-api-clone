@@ -26,6 +26,7 @@ export interface JWTDecodedOutput {
   };
   permissions?: Record<string, string>[];
   deviceId?: string;
+  super?: boolean;
 }
 
 export interface IOutputWorkspacePermission {

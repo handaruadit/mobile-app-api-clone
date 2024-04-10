@@ -5,10 +5,11 @@ import {
   workspace as workspaceEntity
 } from '@/models';
 import { IDeviceModelWithId } from '@/models/device';
+import { IUserModelWithId } from '@/models/user';
 
 import Exception from "@/lib/exception";
 import resource from "@/middleware/resource-router-middleware";
-import { ErrorCodes, IAdminPostDeviceBody, IUserModelWithId } from "@/types";
+import { ErrorCodes, IAdminPostDeviceBody } from "@/types";
 import { DEFAULT_DEVICE_SPEC } from '@/lib/device';
 import { generateDeviceToken } from '@/lib/jwt';
 
