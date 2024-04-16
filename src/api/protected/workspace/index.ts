@@ -218,6 +218,7 @@ export default () =>
     post: async ({ account, body }, res) => {
       const data = body as InputProtectedWorkspacePostBody;
       const payload = {
+        ...body,
         name: data.name,
         language: data.language,
         timezone: data.timezone,
@@ -229,7 +230,7 @@ export default () =>
         } : undefined,
         location:  data.coordinates ? {
           type: 'Point',
-          coordinates: [body.coordinates.longitude, body.coordinates.latitude]
+          coordinates: [body.coordinates?.longitude, body.coordinates?.latitude]
         } : undefined,
         members: data.members
       };
@@ -278,6 +279,7 @@ export default () =>
       if (body.ownerId) delete body.ownerId;
 
       const payload: InputProtectedWorkspacePutBody = {
+        ...body,
         name: body.name,
         language: body.language,
         timezone: body.timezone,
@@ -288,7 +290,7 @@ export default () =>
         } : undefined,
         location: {
           type: 'Point',
-          coordinates: [body.coordinates.longitude, body.coordinates.latitude]
+          coordinates: [body.coordinates?.longitude, body.coordinates?.latitude]
         },
         members: body.members
       };
