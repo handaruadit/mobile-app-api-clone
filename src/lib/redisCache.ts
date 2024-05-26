@@ -19,7 +19,7 @@ export default class RedisCache {
 
     this.client.on('error', (err) => {
       this.connected = false;
-      console.warn(`[Redis] ${err}`);
+      // console.warn(`[Redis] ${err}`);
     });
 
     this.client.on('connect', () => {

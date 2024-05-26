@@ -1,27 +1,5 @@
 ### How to load environment variables
-
-We use infisical to manage environment variables. To load environment variables, run the following command:
-
-1. Install infisical
-
-```bash
-brew install infisical/get-cli/infisical
-```
-
-2. Login
-
-```bash
-infisical login
-```
-
-- Self Hosting
-- Domain: https://vault.afnane.top
-
-3. start the server
-
-```bash
-infisical run -- npm run dev
-```
+...
 
 ### Commit Message Format
 
@@ -57,3 +35,4 @@ The subject contains succinct description of the change:
 - use the imperative, present tense: "change" not "changed" nor "changes"
 - don't capitalize first letter
 - no dot (.) at the end
+

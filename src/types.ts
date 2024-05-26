@@ -38,6 +38,7 @@ export * from './interfaces/endpoints/protected/workspace/user';
 export * from './interfaces/endpoints/protected/device';
 export * from './interfaces/endpoints/protected/workspace';
 export * from './interfaces/endpoints/protected/workspace/main-data';
+export * from './interfaces/endpoints/protected/notification';
 
 // RUNNER
 export * from './interfaces/endpoints/runner/workspace';

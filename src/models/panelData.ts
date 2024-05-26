@@ -20,29 +20,26 @@ const schema = new Schema(
       // required: [true, ValidationErrorCodes.WORKSPACE_IS_REQUIRED],
       ref: 'Device',
     },
+    inverterId: {
+      type: String
+    },
     metadata: { type: Object },
-    acVoltageIn: {
-      type: Number, // unit: volts
-    },
-    acCurrentIn:  {
-      type: Number, // unit: amperes
-    },
-    acPowerIn:  {
-      type: Number, // unit: watts
-    },
-    acVoltageOut: {
-      type: Number, // unit: volts
-    },
-    acCurrentOut:  {
-      type: Number, // unit: amperes
-    },
-    acPowerOut:  {
-      type: Number, // unit: watts
-    },
 
-    timezone: {
-      type: String,
-      // required: [true, ValidationErrorCodes.TIMEZONE_REQUIRED]
+    // PV panel
+    voltage: {
+      type: Number, // unit: volts
+    },
+    current:  {
+      type: Number, // unit: amperes
+    },
+    power:  {
+      type: Number, // unit: watts
+    },
+    lux: {
+      type: Number, // lux
+    },
+    temperature: {
+      type: Number // Celcius
     },
     isOnline: {
       type: Boolean
@@ -63,19 +60,19 @@ const schema = new Schema(
   }
 );
 
-export type IInverterDataModel = InferSchemaType<typeof schema>;
-export type IInverterDataModelWithId = IInverterDataModel & {
+export type IPanelDataModel = InferSchemaType<typeof schema>;
+export type IPanelDataModelWithId = IPanelDataModel & {
   _id: Types.ObjectId;
 };
-export type IInverterDataModelOutput = StringIds<IInverterDataModelWithId>;
-export type IInverterDataModelPayload = Omit<
-  IInverterDataModel,
+export type IPanelDataModelOutput = StringIds<IPanelDataModelWithId>;
+export type IPanelDataModelPayload = Omit<
+  IPanelDataModel,
   'createdAt' | 'updatedAt'
 >;
 
 class MongooseModel extends Abstract {
-  declare model: Model<IInverterDataModel>;
-  interface: IInverterDataModel;
+  declare model: Model<IPanelDataModel>;
+  interface: IPanelDataModel;
 
   constructor() {
     super();
@@ -83,7 +80,7 @@ class MongooseModel extends Abstract {
   }
 
   defineModel = () => {
-    this.model = model('InverterData', schema);
+    this.model = model('PanelData', schema);
   };
 
   /**
@@ -95,20 +92,7 @@ class MongooseModel extends Abstract {
    */
   getMainStats = async (deviceIds: string[] | Types.ObjectId[],  days: number, timezone: string = 'UTC') => {
     const todayStart = moment().tz(timezone).subtract(days, 'days').startOf('day');
-
-    // const deviceList = await device.find<IDeviceModelWithId>({
-    //   _id: { $in: deviceIds }
-    // });
-    // const batteryIds = [];
-    // const pvIds = [];
-    // const inverterIds = [];
-
-    // deviceList.map((device) => {
-    //   batteryIds.push(...(device.batteryIds ?? []));
-    //   pvIds.push(...(device.panelIds ?? []));
-    //   inverterIds.push(...(device.inverterIds ?? []));
-    // });
-  
+    
     const pipeline = [
       {
         $match: {
@@ -119,20 +103,10 @@ class MongooseModel extends Abstract {
       {
         $group: {
           _id: null,
-          totalPowerIn: { $sum: "$acPowerIn" },
-          averagePowerIn: { $avg: "$acPowerIn" },
-          totalPowerOut: { $sum: "$acPowerOut" },
-          averagePowerOut: { $avg: "$acPowerOut" },
-          totalConsumption: { $sum: "$acPowerOut" },
-          averageConsumption: { $avg: "$acPowerOut" },
-          totalAcVoltageIn: { $sum: "$acVoltageIn" },
-          averageAcVoltageIn: { $avg: "$acVoltageIn" },
-          totalAcVoltageOut: { $sum: "$acVoltageOut" },
-          averageAcVoltageOut: { $avg: "$acVoltageOut" },
-          totalAcCurrenctIn: { $sum: "$acCurrenctIn" },
-          averageAcCurrenctIn: { $avg: "$acCurrenctIn" },
-          totalAcCurrentOut: { $sum: "$acCurrentOut" },
-          averageAcCurrentOut: { $avg: "$acCurrentOut" }
+          totalYield: { $sum: { $add: ["$panelPower", "$batteryPower"] } },
+          totalConsumption: { $sum: { $add: ["$panelPower", "$batteryPower" ] } },
+          totalCharging: { $sum: "$batteryPower" },
+          totalPowerUsage: { $sum: "$panelPower" }
         }
       }
     ];
@@ -144,7 +118,7 @@ class MongooseModel extends Abstract {
   getTimeseriesData = async (deviceIds: string[] | Types.ObjectId[], hours?: number, timezone: string = 'UTC') => {
     const filterDate = moment().tz(timezone).subtract(hours, 'hours').toDate();
     
-    return await this.find<IInverterDataModelWithId>(
+    return await this.find<IPanelDataModelWithId>(
       {
         sentAt: { $gte: filterDate },
         deviceId: { $in: deviceIds }
@@ -154,11 +128,7 @@ class MongooseModel extends Abstract {
       undefined,
       undefined,
       undefined,
-<<<<<<< HEAD
-      'deviceId sentAt acCurrentIn acPowerIn acVoltageIn acCurrentOut acPowerOut acVoltageOut temperature heatIndex humidity createdAt'
-=======
-      'deviceId sentAt panelCurrent panelPower panelVoltage batteryPower batteryCurrent batteryVoltage createdAt'
->>>>>>> 0086a5cbdcf962a9a5060922e80e27ae51fdacf5
+      'deviceId sentAt current power voltage power lux createdAt'
     );
   }
 

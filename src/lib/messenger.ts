@@ -1,6 +1,10 @@
 
-import { inverterData } from '@/models';
+import fs from 'fs';
+import { batteryData, inverterData, panelData } from '@/models';
 import MQTT from './mqtt';
+
+type DeviceType = 'batteries' | 'inverters-ac-input' | 'inverters-ac-output' | 'pv-modules';
+// type DeviceType = 'batteries' | 'invertert' | 'pv-modules';
 
 class Messenger {
   private static instance: Messenger;
@@ -15,28 +19,39 @@ class Messenger {
     return Messenger.instance;
   }
 
-  processContents = (msg: { content: object }) => {
-    if (!msg) {
-      return;
-    }
+  processContents = () => {
+    this.mqtt.client.on('message', (topic, {}, message) => {
+      console.log(`Received message on topic ${topic}`);
+      const {
+        siteId,
+        type,
+        deviceId
+      } = this._getTopicInformation(topic);
+      const payloadString = message.payload;
+      const fileName = `data_test/${siteId}/${type}-${deviceId}${new Date().toDateString()}.json`;
+      const dir = `data_test/${siteId}`;
+      if (!fs.existsSync(dir)){
+          fs.mkdirSync(dir, { recursive: true });
+      }
+      fs.writeFileSync(fileName, payloadString); // might be temporary for monitoring
+      console.log(`payload ${String(payloadString)}`);
 
-    const message = JSON.parse(msg.content.toString());
-    if (message) {
-      // add process message here
-      this.processMessage(message.type, message.id, message.data)
-        .then(() => {
-          this.mqtt.channel.ack(msg);
-        })
-        .catch((error) => {
-          console.error('Failed to acknowledge');
-          console.log(error);
-          this.mqtt.channel.nack(msg);
-        });
-
-      return;
-    }
-
-    this.mqtt.channel.ack(msg);
+      if (payloadString) {
+        // add process message here
+        this.processMessage(topic, siteId, type, deviceId, String(payloadString))
+          .then(() => {
+            // this.mqtt.channel.ack(msg);
+            console.log('data has been processed!');
+          })
+          .catch((error) => {
+            console.error('Failed to acknowledge');
+            console.log(error);
+            // this.mqtt.channel.nack(msg);
+          });
+  
+        return;
+      }
+    });
   };
 
   /**
@@ -46,31 +61,122 @@ class Messenger {
    * @param payload 
    * @returns 
    */
-  processMessage = async (type: string, id: string, payload: any) => {
+  processMessage = async (topic: string, siteId: string, type: string, devicePartId_: DeviceType | string, payload: string) => {
+    const parameters = this._parseDataString(payload, type as DeviceType);
+    const deviceId = '6609400e75bea81a6ddac66e'; // temporary, TODO: find devicePartId from device model
+  
     switch (type) {
-      case 'inverter.main-data':
+      // battery data
+      case 'batteries':
         // Send acknowledgment
-        const saving = await inverterData.create({
-          siteId: payload.site_id,
-          deviceId: payload.inverter_id,
-          metadata: payload.metadata,
-          panelVoltage: payload.panel_voltage,
-          batteryVoltage: payload.battery_voltage,
-          panelCurrent: payload.panel_current,
-          batteryCurrent: payload.battery_current,
-          panelPower: payload.panel_power,
-          batteryPower: payload.battery_power,
-          sentAt: payload.sent_at,
+        // batteryId,voltage,current,power,temperature,humidity,heat-index
+        return await batteryData.create({
+          siteId: siteId,
+          deviceId: deviceId,
+          uuid: devicePartId_,
+          metadata: { raw: payload },
+          voltage: parameters.voltage,
+          current: parameters.current,
+          power: parameters.power,
+          temperature: parameters.temperature,
+          humidity: parameters.humidity,
+          heatIndex: parameters.heatIndex,
+          // sentAt: payload.sent_at,
           receivedAt: new Date()
         });
-        return saving;
-      case 'inverter.status':
-        console.log('status data', type, id, payload);
-        break;
+      case 'inverters-ac-input':
+        // batteryId,voltage,current,power,temperature,humidity,heat-index
+        return await inverterData.create({
+          siteId: siteId,
+          deviceId: deviceId,
+          uuid: devicePartId_,
+          metadata: { raw: payload },
+          acVoltageIn: parameters.voltage,
+          acCurrentIn: parameters.current,
+          acPowerIn: parameters.power,
+          receivedAt: new Date()
+        });
+      case 'inverters-ac-output':
+        // batteryId,voltage,current,power,temperature,humidity,heat-index
+        return await inverterData.create({
+          siteId: siteId,
+          deviceId: deviceId,
+          uuid: devicePartId_,
+          metadata: { raw: payload },
+          acVoltageOut: parameters.voltage,
+          acCurrentOut: parameters.current,
+          acPowerOut: parameters.power,
+          receivedAt: new Date()
+        });
+      case 'pv-modules':
+        // inverterId,voltage,current,power,temperature,lux
+        return await panelData.create({
+          siteId: siteId,
+          deviceId: deviceId,
+          inverterId: devicePartId_,
+          metadata: { raw: payload },
+          voltage: parameters.voltage,
+          current: parameters.current,
+          power: parameters.power,
+          receivedAt: new Date()
+        });
       default:
         throw 'Invalid type';
     }
   };
+
+  _getTopicInformation = (topic: string) => {
+    const parts = topic.split('/');
+    if (parts.length >= 4 && parts[0] === 'batari-energy') {
+      return {
+        siteId: parts[1],
+        type: parts[2] === 'inverters' ? `${parts[2]}-${parts[4]}` : parts[2],
+        deviceId: parts[3]
+      };
+    } else {
+      throw new Error('Invalid topic format');
+    }
+  }
+
+  _parseDataString = (dataString: string, type: DeviceType) => {
+    const parameters = dataString.split(',').map(param => param === 'nan' ? null : param);
+    switch (type) {
+      // battery data
+      case 'batteries':
+        // Send acknowledgment
+        // batteryId,voltage,current,power,temperature,humidity,heat-index
+        return {
+          batteryId: parameters[0],
+          voltage: parameters[1],
+          current: parameters[2],
+          power: parameters[3],
+          temperature: parameters[4],
+          humidity: parameters[5],
+          heatIndex: parameters[6],
+        }
+      case 'inverters-ac-input':
+      case 'inverters-ac-output':
+        // batteryId,voltage,current,power,temperature,humidity,heat-index
+        return {
+          inverterId: parameters[0],
+          voltage: parameters[1],
+          current: parameters[2],
+          power: parameters[3],
+        }
+      case 'pv-modules':
+        // inverterId,voltage,current,power,temperature,lux
+        return {
+          inverterId: parameters[0],
+          voltage: parameters[1],
+          current: parameters[2],
+          power: parameters[3],
+          temperature: parameters[4],
+          lux: parameters[5]
+        }
+      default:
+        throw 'Invalid MQTT device type!'
+      }
+  }
 }
 
 export default Messenger;

@@ -217,6 +217,7 @@ export default () =>
      */
     post: async ({ account, body }, res) => {
       const data = body as InputProtectedWorkspacePostBody;
+      console.log("CEK PAYLOAD", body)
       const payload = {
         ...body,
         name: data.name,
@@ -262,6 +263,7 @@ export default () =>
      */
     put: async ({ account, body, params }, res) => {
       const { id } = params;
+      console.log("CEK PAYLOAD!!", body)
 
       if (!isValidObjectId(id)) {
         Exception.notValid(res, ErrorCodes.VALIDATION_ERROR);

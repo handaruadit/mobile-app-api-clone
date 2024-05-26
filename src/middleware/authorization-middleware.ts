@@ -19,6 +19,7 @@ export default async (req: Request, res: Response, next: NextFunction) => {
     req.account = account;
   } else if (isRefreshTokenPath) {
     try {
+      console.log("REFRESHING")
       const { account, jwt } =
         (await isTokenValid(req.headers, 'refresh')) ?? {};
 

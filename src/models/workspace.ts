@@ -41,7 +41,9 @@ const schema = new Schema(
     },
     plnPricePerKwh: Number, // in Rupiah
     userAvgDailyConsumption: Number, // kWh
+    userAvgMonthlyExpenses: Number,
     calculatedAvgDailyConsumption: Number, // kWh
+    calculatedAvgMonthlyExpenses: Number, // kWh
     avgSunlightPerDay: Number, // hour
     ownerId: {
       type: Schema.Types.ObjectId,

@@ -4,6 +4,7 @@ dist/
 .env
 .env.*
 .DS_Store
+creds/
 
 # TypeScript
 *.tsbuildinfo
@@ -55,3 +56,7 @@ coverage/
 ehthumbs.db
 Thumbs.db
 
+
+
+# data
+data_test/

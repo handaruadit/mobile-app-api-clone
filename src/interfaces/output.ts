@@ -33,3 +33,13 @@ export interface IOutputWorkspacePermission {
   entity?: Entities;
   role?: Roles;
 }
+
+export interface IPublicRegisterPayload {
+  uuid: string;
+  ip: string;
+  platform?: "android" | "ios";
+  name?: string;
+  versionName?: string;
+  systemVersion?: string;
+  buildNumber?: string;
+}

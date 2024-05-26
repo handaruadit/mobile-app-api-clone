@@ -2,7 +2,6 @@ import { isValidObjectId } from 'mongoose';
 
 import {
   device as deviceEntity,
-  inverterData,
   workspace as workspaceEntity
 } from '@/models';
 
@@ -10,6 +9,7 @@ import { ErrorCodes } from '@/lib/enum';
 import Exception from '@/lib/exception';
 import resource from '@/middleware/resource-router-middleware';
 import { OutputProtectedTimeseriesData } from '@/interfaces/endpoints/protected/workspace/main-data';
+import { getTimeseriesData } from '@/lib/statistics';
 
 export default () =>
   resource({
@@ -52,12 +52,13 @@ export default () =>
         const days = isNaN(parsedDays) ? 0 : parsedDays;
         const parsedHours = parseInt(fromLastHour ?? '0');
         const hours = isNaN(parsedHours) ? 0 : parsedHours;
-        let startFrom = (days+1) * 24;
-        if (hours) {
-          startFrom = hours;
-        }
-        const stats = await inverterData.getTimeseriesData(ids, startFrom);
-        res.json(stats satisfies OutputProtectedTimeseriesData);
+        const stats = await getTimeseriesData(ids, days, hours);
+
+        res.json({
+          batteryData: stats[0][0] ?? [],
+          inverterData: stats[1][0] ?? [],
+          panelData: stats[2][0] ?? [],
+        } satisfies OutputProtectedTimeseriesData);
       } catch (error) {
         Exception.parseError(res, error);
       }
@@ -102,15 +103,15 @@ export default () =>
 
         const parsedDays = parseInt(fromLastDays ?? '0');
         const days = isNaN(parsedDays) ? 0 : parsedDays;
-        // const parsedHours = parseInt(fromLastHour ?? '0');
-        // const hours = isNaN(parsedHours) ? 0 : parsedHours;
-        // let startFrom = (days+1) * 24;
-        // if (hours) {
-        //   startFrom = hours;
-        // }
-        const stats = await inverterData.getTimeseriesData(deviceIds, days);
+        const parsedHours = parseInt(fromLastHour ?? '0');
+        const hours = isNaN(parsedHours) ? 0 : parsedHours;
+        const stats = await getTimeseriesData(deviceIds, days, hours);
 
-        res.json(stats satisfies OutputProtectedTimeseriesData);
+        res.json({
+          batteryData: stats[0][0] ?? [],
+          inverterData: stats[1][0] ?? [],
+          panelData: stats[2][0] ?? [],
+        } satisfies OutputProtectedTimeseriesData);
       } catch (error) {
         Exception.parseError(res, error);
       } 

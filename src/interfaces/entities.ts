@@ -30,6 +30,15 @@ export interface IAdminDeleteOutput {
   code: ReturnCodes;
 };
 
+export interface IUsersDeviceSettingEntity {
+  geolocation?: boolean;
+  notifications?: boolean;
+  darkMode?: DeviceDarkModeSettings;
+  time24?: boolean;
+  language?: string;
+}
+
+
 // interface ICompanyOwner {
 //   _id?: Types.ObjectId | string;
 //   name?: string;
@@ -98,6 +107,7 @@ export interface IOutputWorkspace {
   userAvgDailyConsumption?: number; 
   calculatedAvgDailyConsumption?: number;
   avgSunlightPerDay?: number;
+  plnPricePerKwh?: number;
   coordinates?: {
     latitude?: number;
     longitude?: number;
@@ -109,6 +119,7 @@ export interface IOutputWorkspace {
   };
   createdAt?: NativeDate | string;
   updatedAt?: NativeDate | string;
+  devices?: IOutputDevice[];
 }
 
 export interface IOutputWorkspacePopulated extends IOutputWorkspace {

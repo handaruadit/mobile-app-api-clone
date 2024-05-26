@@ -7,6 +7,7 @@ import mongoose from 'mongoose';
 import api from '@/api';
 
 import config from '@/config';
+import firebase from '@/lib/firebase';
 import RedisCache from '@/lib/redisCache';
 import autorizationMiddleware from '@/middleware/authorization-middleware';
 
@@ -32,6 +33,8 @@ app.use(autorizationMiddleware);
 
 const client = new RedisCache();
 const mqtt = new MQTT();
+
+firebase.getInstance();
 
 // connect to db
 initializeDb()
