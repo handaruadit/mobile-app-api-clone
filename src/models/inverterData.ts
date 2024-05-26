@@ -154,11 +154,7 @@ class MongooseModel extends Abstract {
       undefined,
       undefined,
       undefined,
-<<<<<<< HEAD
       'deviceId sentAt acCurrentIn acPowerIn acVoltageIn acCurrentOut acPowerOut acVoltageOut temperature heatIndex humidity createdAt'
-=======
-      'deviceId sentAt panelCurrent panelPower panelVoltage batteryPower batteryCurrent batteryVoltage createdAt'
->>>>>>> 0086a5cbdcf962a9a5060922e80e27ae51fdacf5
     );
   }
 
