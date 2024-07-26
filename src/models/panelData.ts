@@ -5,6 +5,7 @@ import type { InferSchemaType, Types, Model } from 'mongoose';
 import Abstract from '@/models/abstract';
 
 import { StringIds } from '@/interfaces/common';
+import { OutputMainPanelData } from '@/types';
 
 const schema = new Schema(
   {
@@ -12,7 +13,9 @@ const schema = new Schema(
       type: String
     },
     siteId: {
-      type: String, // should be type: Schema.Types.ObjectId in the future.
+      type: Schema.Types.ObjectId,
+      required: true,
+      ref: 'Workspace'
     },
     deviceId:  {
       type: Schema.Types.ObjectId,
@@ -90,15 +93,24 @@ class MongooseModel extends Abstract {
    * @param timezone 
    * @returns 
    */
-  getMainStats = async (deviceIds: string[] | Types.ObjectId[],  days: number, timezone: string = 'UTC') => {
+  getMainStats = async (
+    deviceIds: string[] | Types.ObjectId[],
+    uuids: string[] | Types.ObjectId[],
+    days: number,
+    timezone: string = 'Asia/Jakarta'
+  ): Promise<OutputMainPanelData> => {
     const todayStart = moment().tz(timezone).subtract(days, 'days').startOf('day');
-    
+    const matchPipeline: any = {
+      sentAt: { $gte: todayStart.toDate() },
+      deviceId: { $in: deviceIds }
+    }
+    if (uuids.length) {
+      matchPipeline.uuid = { $in: uuids };
+    };
+  
     const pipeline = [
       {
-        $match: {
-          sentAt: { $gte: todayStart.toDate() },
-          deviceId: { $in: deviceIds }
-        }
+        $match: matchPipeline
       },
       {
         $group: {
@@ -111,7 +123,8 @@ class MongooseModel extends Abstract {
       }
     ];
 
-    return await this.model.aggregate(pipeline);
+    const result = await this.model.aggregate(pipeline);
+    return result ? result[0] : {};
   }
 
   // TODO

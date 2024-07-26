@@ -63,7 +63,6 @@ class Exception {
   }
 
   conflict(res: Response, code = 'Conflict', payload?: Record<string, any>) {
-    console.log('should here', this.formatReturnedError(code, payload))
     res.status(409).json(this.formatReturnedError(code, payload));
   }
 

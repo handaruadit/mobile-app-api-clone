@@ -71,7 +71,7 @@ class MQTT {
   };
 
   addMainSubscriber = () => {
-    this.client.subscribe('batari-energy/#');
+    // this.client.subscribe('batari-energy/#');
     // this.client.subscribe('batari-energy/st-id/batteries/bat-id');
     this.messenger.processContents();
   }

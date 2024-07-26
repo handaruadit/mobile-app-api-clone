@@ -13,12 +13,23 @@ interface Action {
   (session: ClientSession): Promise<any>;
 }
 
-export default class Abdstract {
+export type PopulateSchemaType = {
+  [key: string]: string
+}
+
+export default class Abstract {
   declare model: Model<any>;
+  declare schemas: PopulateSchemaType;
 
   getModel = () => this.model;
 
-  populate = (query: Query<any, any>) => query;
+  populate = (query: Query<any, any>, schemas?: PopulateSchemaType): Query<any, any> => {
+    const selectedSchema = schemas ? schemas : this.schemas;
+    Object.keys(selectedSchema).map((schema) => {
+      query = query.populate(schema, selectedSchema[schema]);
+    });
+    return query;
+  }
 
   get = async <T>(id: Types.ObjectId | string, populate?: boolean): Promise<T | undefined> => {
     const query = this.model.findById(id);
@@ -37,7 +48,7 @@ export default class Abdstract {
     field = 'createdAt',
     order = 'descending',
     limit?: number,
-    populate?: boolean,
+    populate?: boolean | PopulateSchemaType,
     skip?: number,
     select?: string
   ): Promise<T[]> => {
@@ -57,8 +68,10 @@ export default class Abdstract {
     if (limit) {
       query = query.limit(limit);
     }
-
-    query = populate ? this.populate(query) : query;
+    
+    if (populate) {
+      query = this.populate(query, typeof populate != 'boolean' ? populate : undefined)
+    }
 
     return await query.lean();
   };

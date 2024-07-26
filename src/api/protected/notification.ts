@@ -41,7 +41,6 @@ export default () =>
         }
         const filtering: any = { userId: account._id };
 
-        console.log('cek log', read)
         if (read && read === 'true') {
           filtering.read = true;
         }

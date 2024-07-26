@@ -4,9 +4,9 @@ export * from './lib/enum';
 export * from './interfaces/common';
 export * from './interfaces/output';
 export * from './interfaces/entities';
+export * from './models';
 
 // MODELS
-// export * from './models/company';
 // export * from './models/tokenInvitation';
 // export * from './models/tokenPassword';
 // export * from './models/user';

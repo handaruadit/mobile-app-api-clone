@@ -62,6 +62,7 @@ export const generateJwtToken = ({
   const payload: JWTDecodedOutput = {
     iss: 'batari',
     id: user._id.toString(),
+    name: user.name,
     email: user.email?.toString() ?? '',
     super: user.isAdmin
   };

@@ -1,5 +1,5 @@
 import moment from 'moment-timezone';
-import type { Types } from 'mongoose';
+import { Types } from 'mongoose';
 import { batteryData, inverterData, panelData } from '@/models';
 import cloneDepp from 'lodash.clonedeep';
 import { OutputMainBatteryData, OutputMainInverterData, OutputMainPanelData, SolarPanelDataOutput } from '@/types';
@@ -7,6 +7,10 @@ import { IBatteryDataModelOutput } from '@/models/batteryData';
 import { IInverterDataModelOutput } from '@/models/inverterData';
 import { IPanelDataModelOutput } from '@/models/panelData';
 
+/**
+ * This can be valid if data is coming every second
+ * @returns 
+ */
 export const inverterMainFilterGroup = () => {
   return {
     _id: null,
@@ -118,25 +122,13 @@ export function calculateSolarPanelData(
 }
 
 export const getMainStats = async (
-  deviceIds: string[] | Types.ObjectId[],
+  deviceIds: (string | Types.ObjectId)[],
   days: number,
   hours?: number,
   timezone: string = 'UTC'
 ): Promise<[OutputMainBatteryData[], OutputMainInverterData[], OutputMainPanelData[], SolarPanelDataOutput]> => {
   const todayStart = moment().tz(timezone).subtract(days, 'days').startOf('day');
 
-  // const deviceList = await device.find<IDeviceModelWithId>({
-  //   _id: { $in: deviceIds }
-  // });
-  // const batteryIds = [];
-  // const pvIds = [];
-  // const inverterIds = [];
-
-  // deviceList.map((device) => {
-  //   batteryIds.push(...(device.batteryIds ?? []));
-  //   pvIds.push(...(device.panelIds ?? []));
-  //   inverterIds.push(...(device.inverterIds ?? []));
-  // });
   const daysFilter = { $gte: todayStart.toDate() };
   const hoursFilter = hours ? { $gte: moment().tz(timezone).subtract(hours, 'hours').toDate() } : undefined;
 

@@ -57,13 +57,17 @@ class Messenger {
   /**
    * This function must have a return statement in order to send acknowledge to RabbitMQ
    * @param type 
-   * @param id 
-   * @param payload 
+   * @param siteId
+   * @param type 
+   * @param devicePartId_ uuid of the part (battery or panel or inverter)
    * @returns 
    */
-  processMessage = async (topic: string, siteId: string, type: string, devicePartId_: DeviceType | string, payload: string) => {
+  processMessage = async (topic: string, siteId: any, type: string, devicePartId_: DeviceType | string, payload: string) => {
     const parameters = this._parseDataString(payload, type as DeviceType);
-    const deviceId = '6609400e75bea81a6ddac66e'; // temporary, TODO: find devicePartId from device model
+    // temporary, TODO: find devicePartId from device model
+    // find the right deviceId from given siteId
+    // it's because we don't have an agreement on how to give an UUID to device
+    const deviceId = '6609400e75bea81a6ddac66e'; 
   
     switch (type) {
       // battery data
@@ -85,7 +89,7 @@ class Messenger {
           receivedAt: new Date()
         });
       case 'inverters-ac-input':
-        // batteryId,voltage,current,power,temperature,humidity,heat-index
+        // inverterId,voltage,current,power,temperature,humidity,heat-index
         return await inverterData.create({
           siteId: siteId,
           deviceId: deviceId,
@@ -97,7 +101,7 @@ class Messenger {
           receivedAt: new Date()
         });
       case 'inverters-ac-output':
-        // batteryId,voltage,current,power,temperature,humidity,heat-index
+        // inverterId,voltage,current,power,temperature,humidity,heat-index
         return await inverterData.create({
           siteId: siteId,
           deviceId: deviceId,

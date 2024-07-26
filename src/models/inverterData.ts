@@ -5,6 +5,7 @@ import type { InferSchemaType, Types, Model } from 'mongoose';
 import Abstract from '@/models/abstract';
 
 import { StringIds } from '@/interfaces/common';
+import { OutputMainInverterData } from '@/types';
 
 const schema = new Schema(
   {
@@ -12,7 +13,9 @@ const schema = new Schema(
       type: String
     },
     siteId: {
-      type: String, // should be type: Schema.Types.ObjectId in the future.
+      type: Schema.Types.ObjectId,
+      required: true,
+      ref: 'Workspace'
     },
     deviceId:  {
       type: Schema.Types.ObjectId,
@@ -93,7 +96,12 @@ class MongooseModel extends Abstract {
    * @param timezone 
    * @returns 
    */
-  getMainStats = async (deviceIds: string[] | Types.ObjectId[],  days: number, timezone: string = 'UTC') => {
+  getMainStats = async (
+    deviceIds: string[] | Types.ObjectId[],
+    uuids: string[] | Types.ObjectId[],
+    days: number,
+    timezone: string = 'Asia/Jakarta'
+  ): Promise<OutputMainInverterData> => {
     const todayStart = moment().tz(timezone).subtract(days, 'days').startOf('day');
 
     // const deviceList = await device.find<IDeviceModelWithId>({
@@ -103,18 +111,16 @@ class MongooseModel extends Abstract {
     // const pvIds = [];
     // const inverterIds = [];
 
-    // deviceList.map((device) => {
-    //   batteryIds.push(...(device.batteryIds ?? []));
-    //   pvIds.push(...(device.panelIds ?? []));
-    //   inverterIds.push(...(device.inverterIds ?? []));
-    // });
-  
+    const matchPipeline: any = {
+      sentAt: { $gte: todayStart.toDate() },
+      deviceId: { $in: deviceIds }
+    }
+    if (uuids.length) {
+      matchPipeline.uuid = { $in: uuids };
+    };
     const pipeline = [
       {
-        $match: {
-          sentAt: { $gte: todayStart.toDate() },
-          deviceId: { $in: deviceIds }
-        }
+        $match: matchPipeline
       },
       {
         $group: {
@@ -137,7 +143,8 @@ class MongooseModel extends Abstract {
       }
     ];
 
-    return await this.model.aggregate(pipeline);
+    const result = await this.model.aggregate(pipeline);
+    return result ? result[0] : {};
   }
 
   // TODO

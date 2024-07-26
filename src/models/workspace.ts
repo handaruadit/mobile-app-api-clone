@@ -5,12 +5,14 @@
  * a workspace must have an admin.
  */
 import { model, Schema, isValidObjectId } from 'mongoose';
-import type { InferSchemaType, Types, Model, Query } from 'mongoose';
+import type { InferSchemaType, Types, Model } from 'mongoose';
 
 import Abstract from '@/models/abstract';
 import { IUserMinimalModel } from '@/types';
 import { StringIds } from '@/interfaces/common';
 import { Entities, Roles, ValidationErrorCodes } from '@/lib/enum';
+import { IDeviceModelWithId } from './device';
+import { ExpressAccount } from '@/types/express';
 
 const schema = new Schema(
   {
@@ -92,8 +94,9 @@ const schema = new Schema(
 export type IWorkspaceModel = InferSchemaType<typeof schema>;
 export type IWorkspaceModelWithId = IWorkspaceModel & {
   _id: Types.ObjectId;
-  _owner: IUserMinimalModel;
-  _members: (IUserMinimalModel & {
+  _device?: IDeviceModelWithId;
+  _owner?: IUserMinimalModel;
+  _members?: (IUserMinimalModel & {
     permissions?: Record<string, string>[];
   })[];
 };
@@ -113,6 +116,11 @@ class MongooseModel extends Abstract {
   constructor() {
     super();
     this.defineModel();
+    this.schemas = {
+      _owner: '', // default to take all fields
+      _members: '',
+      _device: ''
+    } 
   }
 
   defineModel = () => {
@@ -127,14 +135,33 @@ class MongooseModel extends Abstract {
       localField: 'members.id',
       foreignField: '_id'
     });
+    schema.virtual('_device', {
+      ref: 'Device',
+      localField: '_id',
+      foreignField: 'workspace',
+      justOne: true
+    });
 
     this.model = model('Workspace', schema);
   };
 
-  populate = (query: Query<any, any>) =>
-    query
-      .populate('_owner', '_id name email')
-      .populate('_members', '_id name email');
+  memberFilter = (account: ExpressAccount, roles?: Roles[]) => {
+    return {
+      members: {
+        $elemMatch: {
+          id: account._id,
+          permissions: {
+            $elemMatch: {
+              entity: Entities.WORKSPACE,
+              role: {
+                $in: roles ?? [Roles.READ, Roles.WRITE, Roles.ADMIN],
+              },
+            },
+          },
+        },
+      },
+    }
+  }
 
   findWorkspacesOfUser = async (
     userId: Types.ObjectId | string,
@@ -163,6 +190,113 @@ class MongooseModel extends Abstract {
     return await this.find<IWorkspaceModelWithId>({
       $or: pipeline
     }, undefined, undefined, undefined, false, undefined, select);
+  }
+
+  filterDevice = (state)=>{
+    const modifier = {
+      online: [
+        {
+          $lookup:{
+            from: 'batterydatas',
+            localField: '_id',
+            foreignField: 'siteId',
+            pipeline:[
+              {
+                $sort:{
+                  sentAt: -1
+                }
+              },
+              {
+                $limit: 1
+              },
+              {
+                $project:{
+                  lastPing:{
+                    $dateDiff:{
+                      startDate: "$createdAt",
+                      endDate: "$$NOW",
+                      unit: "minute"
+                    }
+                  },
+                  status: "online"
+                  // /* Debugging Parameters */
+                  // sentAt: "$sentAt",
+                  // datenow: "$$NOW",
+                  // dateCreated: "$createdAt"
+                }
+              },
+              {
+                $match:{
+                  lastPing:{
+                    $lte: 2 // 2 minutes
+                  }
+                }
+              }
+            ],
+            as: "devicePingStatus"
+          }
+        },
+        {
+          $match:{
+            devicePingStatus:{
+              $ne: []
+            }
+          }
+        }
+      ],
+      offline: [
+        {
+          $lookup:{
+            from: 'batterydatas',
+            localField: '_id',
+            foreignField: 'siteId',
+            pipeline:[
+              {
+                $sort:{
+                  sentAt: -1
+                }
+              },
+              {
+                $limit: 1
+              },
+              {
+                $project:{
+                  lastPing:{
+                    $dateDiff:{
+                      startDate: "$createdAt",
+                      endDate: "$$NOW",
+                      unit: "minute"
+                    }
+                  },
+                  status: "offline"
+                  // /* Debugging Parameters */
+                  // sentAt: "$sentAt",
+                  // datenow: "$$NOW",
+                  // dateCreated: "$createdAt"
+                }
+              },
+              {
+                $match:{
+                  lastPing:{
+                    $gt: 2 // 2 minutes
+                  }
+                }
+              }
+            ],
+            as: "devicePingStatus"
+          }
+        },
+        {
+          $match:{
+            devicePingStatus:{
+              $ne: []
+            }
+          }
+        }
+      ]
+    }
+
+    return modifier[state]
   }
 }
 

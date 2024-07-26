@@ -1,5 +1,31 @@
 ### How to load environment variables
-...
+1. Get to Know Infisical
+    - We use infisical as a way to share environment secrets to avoid printmark anywhere and as secure way as possible.
+    Infisical can be installed using Scoop packagemanager 
+2. Install Scoop on Windows
+    - As in https://github.com/ScoopInstaller/Scoop;
+    - Run windows power shell, change the execution policy to enable remote fetching:
+    - ```
+        Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
+        ```
+    - Then fetch scoop from shell:
+    - ```
+        Invoke-RestMethod -Uri https://get.scoop.sh | Invoke-Expression
+        ```
+    - Scoop should be successfuly installed on your machine
+3. Install Infisical on your Machine
+    - As in https://infisical.com/docs/cli/overview;
+    - Stage infisical origin to your Scoop bucket
+    - ```
+        scoop bucket add org https://github.com/Infisical/scoop-infisical.git
+        ```
+    - Hit it
+    - ```
+        scoop install infisical
+        ```
+4. Update Ubuntu 18 to 22
+https://www.benjaminrancourt.ca/how-to-update-ubuntu-in-wsl-from-18-04-to-22-04/
+4. Fetch the Environment via Token
 
 ### Commit Message Format
 

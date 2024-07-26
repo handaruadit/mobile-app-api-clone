@@ -3,7 +3,10 @@ import { isValidObjectId, Types } from 'mongoose';
 import {
   workspace as entity,
   tokenInvitation,
-  device as deviceEntity
+  device as deviceEntity,
+  inverterData,
+  batteryData,
+  panelData
 } from '@/models';
 import { ITokenInvitationModelWithId } from '@/models/tokenInvitation';
 import {
@@ -25,6 +28,7 @@ import Exception from '@/lib/exception';
 import { checkJWTPermissions } from '@/lib/permission';
 import resource from '@/middleware/resource-router-middleware';
 import { IDeviceModelWithId } from '@/models/device';
+import { IOutputWorkspaceList } from '@/types';
 
 export default () =>
   resource({
@@ -52,7 +56,9 @@ export default () =>
      *          schema:
      *            "$ref": "./components.yaml#/components/schemas/OutputProtectedWorkspaceList"
      */
-    list: async ({ account, jwt }, res) => {
+    list: async ({ account, jwt, query }, res) => {
+      // query.availability = <"online"|"offline" :String>
+
       const pipeline = [
         {
           $match: {
@@ -81,7 +87,7 @@ export default () =>
             from: 'devices',
             localField: '_id',
             foreignField: 'workspace',
-            as: 'devices'
+            as: 'device'
           }
         },
         {
@@ -95,19 +101,19 @@ export default () =>
         {
           $addFields: {
             invitationCount: { $size: '$invitations' },
-            deviceCount: { $size: '$devices' },
-            totalPanelCapacity: { $sum: '$devices.panelCapacity' }
+            device: { $arrayElemAt: ["$device", 0] }
+            // deviceCount: { $size: '$devices' },
+            // totalPanelCapacity: { $sum: '$devices.panelCapacity' }
           }
         },
         {
           $project: {
             invitations: 0
           }
-        }
+        },
+        ... query.availability ? entity.filterDevice(query.availability) : []
       ];
-      const workspaces = await entity.model.aggregate<
-        IEntityModel & { invitationCount?: number; deviceCount?: number; totalPanelCapacity?: number }
-      >(pipeline);
+      const workspaces = await entity.model.aggregate<IOutputWorkspaceList>(pipeline);
 
       const userHasWritePermission = checkJWTPermissions({
         jwt,
@@ -120,6 +126,36 @@ export default () =>
           workspace.invitationCount = undefined;
           workspace.members = [];
         });
+      }
+
+      // get statistics data
+      /**
+       * 1. inverter in
+       * 2. inverter out
+       * 3. battery in
+       * 4. battery out
+       */
+      // get inverter data
+      try {
+        for (let workspace of workspaces) {
+          // const batteryIds = workspace.device?.batteries?.map((battery) => battery.uuid) ?? [];
+          // const inverterIds = workspace.device?.inverters?.map((inverter) => inverter.uuid) ?? [];
+          // const panelIds = workspace.device?.panels?.map((panel) => panel.uuid) ?? [];
+          const deviceId = workspace.device?._id;
+          if (deviceId) {
+            [
+              workspace.inverterData,
+              workspace.batteryData,
+              workspace.panelData,
+            ] = await Promise.all([
+              inverterData.getMainStats([deviceId], [], 1),
+              batteryData.getMainStats([deviceId], [], 1),
+              panelData.getMainStats([deviceId], [], 1)
+            ])
+          };
+        }
+      } catch (error) {
+        console.error(error);
       }
 
       res.json({
@@ -262,44 +298,47 @@ export default () =>
      *            "$ref": "./components.yaml#/components/schemas/OutputProtectedWorkspacePut"
      */
     put: async ({ account, body, params }, res) => {
-      const { id } = params;
-      console.log("CEK PAYLOAD!!", body)
-
-      if (!isValidObjectId(id)) {
-        Exception.notValid(res, ErrorCodes.VALIDATION_ERROR);
-        return;
+      try {
+        const { id } = params;
+  
+        if (!isValidObjectId(id)) {
+          Exception.notValid(res, ErrorCodes.VALIDATION_ERROR);
+          return;
+        }
+  
+        const [checkOwnership] = await entity.findWorkspacesOfUser(account._id);
+  
+        if (!checkOwnership) {
+          Exception.notValid(res, ErrorCodes.USER_NOT_AUTHORIZED);
+          return;
+        }
+  
+        
+        if (body.ownerId) delete body.ownerId;
+  
+        const payload: InputProtectedWorkspacePutBody = {
+          ...body,
+          name: body.name,
+          language: body.language,
+          timezone: body.timezone,
+          coordinates: body.coordinates ? {
+            latitude: body.coordinates.latitude,
+            longitude: body.coordinates.longitude,
+            elevation: body.coordinates.elevation
+          } : undefined,
+          location: {
+            type: 'Point',
+            coordinates: [body.coordinates?.longitude, body.coordinates?.latitude]
+          },
+          members: body.members
+        };
+  
+        const workspace = await entity.update<IEntityModel>(id, payload);
+  
+        res.json({ workspace } satisfies OutputProtectedWorkspacePut);
+      } catch (error) {
+        Exception.parseError(res, error);
       }
-
-      const [checkOwnership] = await entity.findWorkspacesOfUser(account._id);
-
-      if (!checkOwnership) {
-        Exception.notValid(res, ErrorCodes.USER_NOT_AUTHORIZED);
-        return;
-      }
-
-      
-      if (body.ownerId) delete body.ownerId;
-
-      const payload: InputProtectedWorkspacePutBody = {
-        ...body,
-        name: body.name,
-        language: body.language,
-        timezone: body.timezone,
-        coordinates: body.coordinates ? {
-          latitude: body.coordinates.latitude,
-          longitude: body.coordinates.longitude,
-          elevation: body.coordinates.elevation
-        } : undefined,
-        location: {
-          type: 'Point',
-          coordinates: [body.coordinates?.longitude, body.coordinates?.latitude]
-        },
-        members: body.members
-      };
-
-      const workspace = await entity.update<IEntityModel>(id, payload);
-
-      res.json({ workspace } satisfies OutputProtectedWorkspacePut);
     },
 
     /**

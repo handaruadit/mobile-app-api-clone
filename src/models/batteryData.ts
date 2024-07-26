@@ -5,6 +5,7 @@ import type { InferSchemaType, Types, Model } from 'mongoose';
 import Abstract from '@/models/abstract';
 
 import { StringIds } from '@/interfaces/common';
+import { OutputMainBatteryData } from '@/types';
 
 const schema = new Schema(
   {
@@ -12,11 +13,16 @@ const schema = new Schema(
       type: String
     },
     siteId: {
-      type: String, // should be type: Schema.Types.ObjectId in the future.
+      type: Schema.Types.ObjectId,
+      // required: true,
+      ref: 'Workspace'
     },
+    // we may miss information about which battery is this!
+    // batteryId != deviceId
+    // assume that batteryId is sent from site, and it's unique to all batteries
     deviceId:  {
       type: Schema.Types.ObjectId,
-      required: true,
+      // required: true,
       // required: [true, ValidationErrorCodes.WORKSPACE_IS_REQUIRED],
       ref: 'Device',
     },
@@ -45,7 +51,7 @@ const schema = new Schema(
     },
     sentAt: {
       type: Date,
-      required: true,
+      // required: true,
       default: new Date()
     },
   },
@@ -83,34 +89,59 @@ class MongooseModel extends Abstract {
   };
 
   /**
-   * 
+   * TODO: MAKE THIS A CLASS BASED SO THAT WE DON'T NEED TO REPEAT FOR OTHER MODEL
    * @param deviceIds 
    * @param days days 0 means it's only today
    * @param timezone 
    * @returns 
    */
-  getMainStats = async (deviceIds: string[] | Types.ObjectId[],  days: number, timezone: string = 'UTC') => {
+  getMainStats = async (
+    deviceIds: string[] | Types.ObjectId[],
+    uuids: string[] | Types.ObjectId[],
+    days: number,
+    timezone: string = 'Asia/Jakarta'
+  ): Promise<OutputMainBatteryData> => {
     const todayStart = moment().tz(timezone).subtract(days, 'days').startOf('day');
+  
+    const matchPipeline: any = {
+      sentAt: { $gte: todayStart.toDate() },
+      deviceId: { $in: deviceIds }
+    }
+    if (uuids.length) {
+      matchPipeline.uuid = { $in: uuids };
+    };
     
     const pipeline = [
       {
-        $match: {
-          sentAt: { $gte: todayStart.toDate() },
-          deviceId: { $in: deviceIds }
-        }
+        $match: matchPipeline
       },
       {
         $group: {
           _id: null,
-          totalYield: { $sum: { $add: ["$panelPower", "$batteryPower"] } },
-          totalConsumption: { $sum: { $add: ["$panelPower", "$batteryPower" ] } },
-          totalCharging: { $sum: "$batteryPower" },
-          totalPowerUsage: { $sum: "$panelPower" }
+          totalYield: { $sum: { $add: ["$power"] } },
+          totalConsumption: {
+            $sum: {
+              $cond: {
+                if: { $lt: ["$power", 0] },
+                then: "$power", else: 0
+              }
+            }
+          },
+          totalCharging: {
+            $sum: {
+              $cond: {
+                if: { $gt: ["$power", 0] },
+                then: "$power", else: 0
+              }
+            }
+          },
+          // totalPowerUsage: { $sum: "$power" }
         }
       }
     ];
 
-    return await this.model.aggregate(pipeline);
+    const result = await this.model.aggregate(pipeline);
+    return result ? result[0] : {};
   }
 
   // TODO

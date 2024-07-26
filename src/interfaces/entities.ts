@@ -1,7 +1,22 @@
-import { Types } from 'mongoose';
+import { Types } from "mongoose";
 
-import { DeviceDarkModeSettings, IOutputWorkspacePermission, ReturnCodes } from '@/types';
+import { IBatteryDataModelWithId } from "@/models/batteryData";
+import { IPanelDataModelWithId } from "@/models/panelData";
+import { IInverterDataModelWithId } from "@/models/inverterData";
+import {
+  DeviceDarkModeSettings,
+  IOutputWorkspacePermission,
+  OutputMainBatteryData,
+  OutputMainInverterData,
+  OutputMainPanelData,
+  ReturnCodes,
+} from "@/types";
+import { IDeviceModelOutput } from "@/models/device";
 
+export type ISitesData =
+  | IBatteryDataModelWithId
+  | IPanelDataModelWithId
+  | IInverterDataModelWithId;
 // USER
 export interface IUserMinimalModel {
   _id: Types.ObjectId | string;
@@ -23,12 +38,12 @@ export interface IBaseUserEntity {
     darkMode: DeviceDarkModeSettings;
     time24: boolean;
     language: string;
-  }
+  };
 }
 
 export interface IAdminDeleteOutput {
   code: ReturnCodes;
-};
+}
 
 export interface IUsersDeviceSettingEntity {
   geolocation?: boolean;
@@ -37,7 +52,6 @@ export interface IUsersDeviceSettingEntity {
   time24?: boolean;
   language?: string;
 }
-
 
 // interface ICompanyOwner {
 //   _id?: Types.ObjectId | string;
@@ -94,7 +108,7 @@ export interface IOutputDevice {
   warrantyExpiration?: NativeDate | string;
   inverterType?: string;
   weatherResistanceRating?: string;
-};
+}
 
 // WORKSPACE
 export interface IOutputWorkspace {
@@ -104,7 +118,7 @@ export interface IOutputWorkspace {
   timezone?: string;
   ownerId?: Types.ObjectId | string;
   members?: IOutputWorkspaceMember[];
-  userAvgDailyConsumption?: number; 
+  userAvgDailyConsumption?: number;
   calculatedAvgDailyConsumption?: number;
   avgSunlightPerDay?: number;
   plnPricePerKwh?: number;
@@ -128,10 +142,14 @@ export interface IOutputWorkspacePopulated extends IOutputWorkspace {
   invitations: IOutputWorkspaceInvitation[];
 }
 
-export interface IOutputWorkspaceList extends IOutputWorkspace  {
+export interface IOutputWorkspaceList extends IOutputWorkspace {
   invitationCount?: number;
   deviceCount?: number;
   totalPanelCapacity?: number;
+  device: IDeviceModelOutput;
+  inverterData?: OutputMainInverterData;
+  batteryData?: OutputMainBatteryData;
+  panelData?: OutputMainPanelData;
 }
 
 export interface IProtectedInverterData {

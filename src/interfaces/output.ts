@@ -16,6 +16,7 @@ export interface JWTDecodedOutput {
   iss?: string;
   id?: string;
   email?: string;
+  name?: string;
   company?: {
     id: string;
     owner: boolean;

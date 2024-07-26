@@ -40,14 +40,44 @@ const schema = new Schema(
       //   message: ValidationErrorCodes.INVALID_WORKSPACE_ID
       // }
     },
-    batteryIds: {
-      type: [String],
+    batteries: {
+      type: [{
+        batteryId: {
+          type: Schema.Types.ObjectId,
+          ref: 'Battery',
+          required: false
+        },
+        uuid: {
+          type: String,
+          required: true
+        }
+      }],
     },
-    panelIds: {
-      type: [String]
+    panels: {
+      type: [{
+        panelId: {
+          type: Schema.Types.ObjectId,
+          ref: 'Panel',
+          required: false
+        },
+        uuid: {
+          type: String,
+          required: true
+        }
+      }],
     },
-    inverterIds: {
-      type: [String]
+    inverters: {
+      type: [{
+        inverterId: {
+          type: Schema.Types.ObjectId,
+          ref: 'Inverter',
+          required: false
+        },
+        uuid: {
+          type: String,
+          required: true
+        }
+      }],
     },
     maxPowerOutput: {
       // in Watts
