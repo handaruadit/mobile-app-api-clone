@@ -81,8 +81,7 @@ class Messenger {
           temperature: parameters.temperature,
           humidity: parameters.humidity,
           heatIndex: parameters.heatIndex,
-          // sentAt: payload.sent_at,
-          receivedAt: new Date()
+          sentAt: new Date() // should be from site
         });
       case 'inverters-ac-input':
         // inverterId,voltage,current,power,temperature,humidity,heat-index
@@ -94,7 +93,7 @@ class Messenger {
           acVoltageIn: parameters.voltage ? Number(parameters.voltage).toFixed(3) : null,
           acCurrentIn: parameters.current ? Number(parameters.current).toFixed(3) : null,
           acPowerIn: parameters.power ? Number(parameters.power).toFixed(3) : null,
-          receivedAt: new Date()
+          sentAt: new Date() // should be from site
         });
       case 'inverters-ac-output':
         // inverterId,voltage,current,power,temperature,humidity,heat-index
@@ -106,7 +105,7 @@ class Messenger {
           acVoltageOut: parameters.voltage ? Number(parameters.voltage).toFixed(3) : null,
           acCurrentOut: parameters.current ? Number(parameters.current).toFixed(3) : null,
           acPowerOut: parameters.power ? Number(parameters.power).toFixed(3) : null,
-          receivedAt: new Date()
+          sentAt: new Date() // should be from site
         });
       case 'pv-modules':
         // inverterId,voltage,current,power,temperature,lux
@@ -120,7 +119,7 @@ class Messenger {
           voltage: parameters.voltage ? Number(parameters.voltage).toFixed(3) : null,
           current: parameters.current ? Number(parameters.current).toFixed(3) : null,
           power: parameters.power ? Number(parameters.power).toFixed(3) : null,
-          receivedAt: new Date()
+          sentAt: new Date() // should be from site
         });
       default:
         throw 'Invalid type';
