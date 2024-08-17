@@ -1,4 +1,4 @@
-import { IOutputWorkspace, IOutputWorkspacePermission } from "@/types";
+import { IOutputWorkspace, IOutputWorkspacePermission } from '@/types';
 
 export interface IAdminPostWorkspaceBody {
   name: string;
@@ -11,7 +11,7 @@ export interface IAdminPostWorkspaceBody {
     type?: string;
     coordinates?: [number, number];
   };
-  userAvgDailyConsumption?: number; 
+  userAvgDailyConsumption?: number;
   calculatedAvgDailyConsumption?: number;
   avgSunlightPerDay?: number;
   language?: string;

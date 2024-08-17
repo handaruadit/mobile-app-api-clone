@@ -1,19 +1,24 @@
 //@ts-nocheck
-import { BusinessRuleValidationError } from "@/lib/error";
-import { ISitesData, StatsOutput } from "@/types";
-import * as dfd from "danfojs-node";
-import { BaseDataOptionType } from "danfojs-node/dist/danfojs-base/shared/types";
-import moment from "moment";
+import { BusinessRuleValidationError } from '@/lib/error';
+import { ISitesData, ITimeseriesStatsOutput, StatsOutput } from '@/types';
+import * as dfd from 'danfojs-node';
+import { BaseDataOptionType } from 'danfojs-node/dist/danfojs-base/shared/types';
 
 export interface IMainStatsOptions {
   timezone?: string;
   days?: number;
   hours?: number;
+  startTime?: Date;
+  endTime?: Date;
+  round?: number; // round result number to n number of decimal
+  source?: 'default' | 'aggregated';
 }
 
 export abstract class DataStats {
+  abstract aggregate: ITimeseriesAggregate;
   abstract getMainStats(options: IMainStatsOptions): Promise<StatsOutput>;
-  abstract getTimeseriesStats(options: IMainStatsOptions): Promise<StatsOutput>;
+  abstract getTimeseriesStats(options: IMainStatsOptions): Promise<ITimeseriesStatsOutput>;
+  abstract getAggregateModel(aggregate?: ITimeseriesAggregate): Model<any, any, any, any, any>;
 }
 /**
  * DataProcessor
@@ -24,18 +29,29 @@ export abstract class DataStats {
  */
 export class DataProcessor {
   private data: ISitesData[];
-  private _timeKey = "sentAt";
+  private _timeKey = 'sentAt';
 
   constructor(data: ISitesData[]) {
     this.data = data ?? [];
     // sanitize data
     if (data.length > 0 && !(this._timeKey in data[0])) {
-      throw new BusinessRuleValidationError("Invalid data supplied");
+      throw new BusinessRuleValidationError('Invalid data supplied');
     }
   }
 
   isBatteryModel(): boolean {
-    return false;
+    if (this.data.length == 0) {
+      return false;
+    } else {
+      return 'humidity' in this.data[0];
+    }
+  }
+  isBatteryDataAggregate(): boolean {
+    if (this.data.length == 0) {
+      return false;
+    } else {
+      return 'avg_humidity' in this.data[0];
+    }
   }
 
   isPanelData(): boolean {
@@ -46,7 +62,15 @@ export class DataProcessor {
     if (this.data.length == 0) {
       return false;
     } else {
-      return "acVoltageIn" in this.data[0];
+      return 'acVoltageIn' in this.data[0];
+    }
+  }
+
+  isInverterDataAggregate(): boolean {
+    if (this.data.length == 0) {
+      return false;
+    } else {
+      return 'total_acVoltageIn' in this.data[0];
     }
   }
 
@@ -57,11 +81,7 @@ export class DataProcessor {
    * @returns
    */
   _getTimeDiff(currentData: ISitesData, previousData: ISitesData) {
-    return (
-      (new Date(currentData[this._timeKey]) -
-        new Date(previousData[this._timeKey])) /
-      1000
-    );
+    return (new Date(currentData[this._timeKey]) - new Date(previousData[this._timeKey])) / 1000;
   }
 
   addTimeDiffDf(df: dfd.DataFrame) {
@@ -70,13 +90,13 @@ export class DataProcessor {
       return (ts - df[this._timeKey].values[i - 1]) / 1000;
       // return momentTime.diff(df[this._timeKey].values[i - 1], 'seconds');
     });
-    return df.addColumn("time_diff", time_diff);
+    return df.addColumn('time_diff', time_diff);
     // return df.withColumn(this._timeKey, df.get(this._timeKey).map((ts: string | Date) => moment(ts)));
   }
 
   excludeFields(data: any[], columns: string[]) {
-    return data.map((data) => {
-      Object.keys(data).map((col) => {
+    return data.map(data => {
+      Object.keys(data).map(col => {
         if (!columns.includes(col)) {
           delete data[col];
         }
@@ -84,22 +104,16 @@ export class DataProcessor {
     });
   }
 
-  getDataframe(
-    options?: BaseDataOptionType & { onlyColumns?: string[]; copy?: boolean }
-  ) {
+  getDataframe(options?: BaseDataOptionType & { onlyColumns?: string[]; copy?: boolean }) {
     const src = options?.copy ? [...this.data] : this.data;
-    const data = options?.onlyColumns
-      ? this.excludeFields(src, options.onlyColumns)
-      : src;
+    const data = options?.onlyColumns ? this.excludeFields(src, options.onlyColumns) : src;
     return new dfd.DataFrame(this.data, options);
   }
 
   getTotalTimeSeconds() {
     if (this.data.length < 2) return 0;
     const startTime = new Date(this.data[0][this._timeKey]).getTime();
-    const endTime = new Date(
-      this.data[this.data.length - 1][this._timeKey]
-    ).getTime();
+    const endTime = new Date(this.data[this.data.length - 1][this._timeKey]).getTime();
     return (endTime - startTime) / 1000; // Convert to seconds
   }
 
@@ -110,20 +124,48 @@ export class DataProcessor {
    * @returns The DataFrame with the added total data.
    */
   addTotalDataDf(entity: string, columnName: string) {
-    let df = this.getDataframe({ onlyColumns: ["sentAt", entity] });
+    let df = this.getDataframe({ onlyColumns: ['sentAt', entity] });
     if (!df.columns.includes(entity)) {
       throw new exception(`${entity} is not in data`);
     }
     // Sort by timestamp to ensure correct order
     df = df.sortValues(this._timeKey);
     df = this.addTimeDiffDf(df);
-    const total = df[entity].mul(df["time_diff"]);
+    const total = df[entity].mul(df['time_diff']);
     df = df.addColumn(columnName, total);
     return df;
   }
 
   getDataLength() {
     return this.data.length;
+  }
+
+  calculateTotal(entity: string, isCharged?: boolean) {
+    let total_data = 0;
+
+    for (let i = 0; i < this.data.length; i++) {
+      const data = this.data[i]; // Get the current data entry
+      let value = 0; // Initialize value to store the entity's value
+
+      // Check if the entity's value is a number
+      if (typeof data[entity] === 'number') {
+        value = data[entity] ?? 0; // Assign the value or 0 if undefined
+
+        // Check if the entity's value is an object with 'value' and 'unit' properties
+      } else if (typeof data[entity] === 'object' && 'value' in data[entity] && 'unit' in data[entity]) {
+        value = data[entity].value ?? 0;
+        // unit conversion here if needed
+      } else if (data[entity] !== undefined) {
+        throw new Error(`Invalid data format for entity: ${entity}`);
+      }
+
+      // Apply isCharged filter
+      if (isCharged === undefined || (isCharged && value > 0) || (!isCharged && value < 0)) {
+        total_data += value; // Accumulate the total_data with the value
+      }
+    }
+
+    return total_data; // Return the accumulated total_data
   }
 
   calculateTotalWithDeltaTime(entity: string, isCharged?: boolean) {
@@ -136,15 +178,11 @@ export class DataProcessor {
       let value = 0; // Initialize value to store the entity's value
 
       // Check if the entity's value is a number
-      if (typeof data[entity] === "number") {
+      if (typeof data[entity] === 'number') {
         value = data[entity] ?? 0; // Assign the value or 0 if undefined
 
         // Check if the entity's value is an object with 'value' and 'unit' properties
-      } else if (
-        typeof data[entity] === "object" &&
-        "value" in data[entity] &&
-        "unit" in data[entity]
-      ) {
+      } else if (typeof data[entity] === 'object' && 'value' in data[entity] && 'unit' in data[entity]) {
         value = data[entity].value ?? 0;
         // unit conversion here if needed
       } else if (data[entity] !== undefined) {
@@ -152,11 +190,7 @@ export class DataProcessor {
       }
 
       // Apply isCharged filter
-      if (
-        isCharged === undefined ||
-        (isCharged && value > 0) ||
-        (!isCharged && value < 0)
-      ) {
+      if (isCharged === undefined || (isCharged && value > 0) || (!isCharged && value < 0)) {
         total_data += value * timeDiff; // Accumulate the total_data with the value multiplied by the time difference
       }
     }
@@ -164,16 +198,24 @@ export class DataProcessor {
     return total_data; // Return the accumulated total_data
   }
 
+  calculateSource(entity: string, isCharged?: boolean) {
+    if (this.isInverterDataAggregate() || this.isBatteryDataAggregate()) {
+      return this.calculateTotal(entity, isCharged);
+    } else {
+      return this.calculateTotalWithDeltaTime(entity, isCharged);
+    }
+  }
+
   calculateTotalEnergyWithDeltaTime(entity: string, isPositive: boolean) {
     let totalEnergy = 0;
     let previousTime = null;
 
-    this.data.forEach((dataPoint) => {
+    this.data.forEach(dataPoint => {
       const currentTime = dataPoint.timestamp;
       if (previousTime) {
         const timeDiff = (currentTime - previousTime) / 1000; // Convert to seconds
         const current = dataPoint[entity];
-        const voltage = dataPoint["voltage"];
+        const voltage = dataPoint['voltage'];
         if ((isPositive && current > 0) || (!isPositive && current < 0)) {
           totalEnergy += current * voltage * timeDiff;
         }
@@ -190,13 +232,9 @@ export class DataProcessor {
       const data = this.data[i];
 
       let value = 0;
-      if (typeof data[entity] === "number") {
+      if (typeof data[entity] === 'number') {
         value = data[entity] ?? 0;
-      } else if (
-        typeof data[entity] === "object" &&
-        "value" in data[entity] &&
-        "unit" in data[entity]
-      ) {
+      } else if (typeof data[entity] === 'object' && 'value' in data[entity] && 'unit' in data[entity]) {
         value = data[entity].value ?? 0;
         // Optionally, you can handle unit conversion here if needed
       } else if (data[entity] !== undefined) {
@@ -213,8 +251,8 @@ export class DataProcessor {
    * @returns The total energy generated in kilowatt-hours.
    */
   getTotalEnergyGeneratedDf() {
-    const df = this.addTotalDataDf("power", "energy");
-    const total_energy_watt_seconds = df["energy"].sum();
+    const df = this.addTotalDataDf('power', 'energy');
+    const total_energy_watt_seconds = df['energy'].sum();
     return total_energy_watt_seconds / (1000 * 3600); // total_energy_kwh
   }
 
@@ -223,7 +261,7 @@ export class DataProcessor {
    * @returns
    */
   getTotalEnergyGenerated() {
-    const total_energy_watt_seconds = this.calculateTotalWithDeltaTime("power");
+    const total_energy_watt_seconds = this.calculateTotalWithDeltaTime('power');
     // Convert watt-seconds to kilowatt-hours
     return total_energy_watt_seconds / (1000 * 3600); // total_energy_kwh
   }

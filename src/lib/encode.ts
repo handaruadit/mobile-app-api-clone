@@ -6,13 +6,7 @@ export const encryptPassword = async (data = ''): Promise<string> => {
   return encrypted;
 };
 
-export const comparePassword = async ({
-  password,
-  encryptedPassword = ''
-}: {
-  password: string;
-  encryptedPassword?: string;
-}): Promise<boolean> => {
+export const comparePassword = async ({ password, encryptedPassword = '' }: { password: string; encryptedPassword?: string }): Promise<boolean> => {
   return await bcrypt.compare(password, encryptedPassword);
 };
 

@@ -42,9 +42,7 @@ export type INotificationModelWithId = InferSchemaType<typeof schema> & {
 };
 export type INotificationModelOutput = StringIds<INotificationModelWithId>;
 
-export type INotificationModelPayload = StringIds<
-  Omit<INotificationModel, 'createdAt' | 'updatedAt'>
->;
+export type INotificationModelPayload = StringIds<Omit<INotificationModel, 'createdAt' | 'updatedAt'>>;
 
 class Model extends Abstract {
   declare model: mongoose.Model<INotificationModel>;
@@ -61,8 +59,8 @@ class Model extends Abstract {
 
   isUserHasPermission = async (notificationId: string, userId: Types.ObjectId | string) => {
     const notif = await this.get<INotificationModelWithId>(notificationId, true);
-    return notif && notif._id.equals(userId)
-  }
+    return notif && notif._id.toString() === userId.toString();
+  };
 }
 
 const inst = new Model();

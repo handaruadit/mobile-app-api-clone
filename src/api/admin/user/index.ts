@@ -8,7 +8,13 @@ import { IUserModelPayload, IUserModelWithId } from '@/models/user';
 import { ErrorCodes, ReturnCodes } from '@/lib/enum';
 import Exception from '@/lib/exception';
 import resource from '@/middleware/resource-router-middleware';
-import { IAdminDeleteUserOutput, IAdminListUserOutput, IAdminPostUserOutput, IAdminPutUserOutput, IAdminReadUserOutput } from '@/interfaces/endpoints/admin/user';
+import {
+  IAdminDeleteUserOutput,
+  IAdminListUserOutput,
+  IAdminPostUserOutput,
+  IAdminPutUserOutput,
+  IAdminReadUserOutput
+} from '@/interfaces/endpoints/admin/user';
 import { isInvalidPaginateParams } from '@/lib/util';
 import { encryptPassword } from '@/lib/encode';
 
@@ -23,11 +29,11 @@ export default () =>
           Exception.notValid(res);
           return;
         }
-  
+
         const [existingUser] = await entity.find<IUserModelWithId>({
           email
         });
-  
+
         if (existingUser) {
           Exception.notValid(res, ErrorCodes.USER_ALREADY_EXISTS);
           return;
@@ -53,14 +59,8 @@ export default () =>
         if (!query) {
           return Exception.notValid(res);
         }
-        const [total, users] = await entity.paginatedFind<IUserModelWithId>(
-          {},
-          'createdAt',
-          'descending',
-          limit,
-          true
-        );
-        
+        const [total, users] = await entity.paginatedFind<IUserModelWithId>({}, 'createdAt', 'descending', limit, true);
+
         res.json({
           data: users,
           offset: Number(offset),
@@ -108,7 +108,7 @@ export default () =>
         const { email, password } = body;
         if (email) {
           const valid = isEmail(email);
-    
+
           if (!valid) {
             Exception.notValid(res);
             return;

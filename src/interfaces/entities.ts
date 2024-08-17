@@ -1,8 +1,8 @@
-import { Types } from "mongoose";
+import { Types } from 'mongoose';
 
-import { IBatteryDataModelWithId } from "@/models/batteryData";
-import { IPanelDataModelWithId } from "@/models/panelData";
-import { IInverterDataModelWithId } from "@/models/inverterData";
+import { IBatteryDataModelWithId } from '@/models/batteryData';
+import { IPanelDataModelWithId } from '@/models/panelData';
+import { IInverterDataModelWithId } from '@/models/inverterData';
 import {
   DeviceDarkModeSettings,
   IOutputWorkspacePermission,
@@ -10,13 +10,13 @@ import {
   OutputMainInverterData,
   OutputMainPanelData,
   ReturnCodes,
-} from "@/types";
-import { IDeviceModelOutput } from "@/models/device";
+  SolarPanelDataOutput
+} from '@/types';
+import { IDeviceModelOutput } from '@/models/device';
+import { IInverterDataAggregate } from '@/models/inverterAggregate';
+import { IBatteryDataAggregate } from '@/models/batteryAggregate';
 
-export type ISitesData =
-  | IBatteryDataModelWithId
-  | IPanelDataModelWithId
-  | IInverterDataModelWithId;
+export type ISitesData = IBatteryDataModelWithId | IPanelDataModelWithId | IInverterDataModelWithId | IInverterDataAggregate | IBatteryDataAggregate;
 // USER
 export interface IUserMinimalModel {
   _id: Types.ObjectId | string;
@@ -150,6 +150,7 @@ export interface IOutputWorkspaceList extends IOutputWorkspace {
   inverterData?: OutputMainInverterData;
   batteryData?: OutputMainBatteryData;
   panelData?: OutputMainPanelData;
+  calculatedData?: SolarPanelDataOutput;
 }
 
 export interface IProtectedInverterData {

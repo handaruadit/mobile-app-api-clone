@@ -20,13 +20,11 @@ const TEMPLATES = {
   },
   INVITATION_SIGNUP: {
     id: 5102734,
-    subject: (companyName: string) =>
-      `[Batari] Signup and join ${companyName}`
+    subject: (companyName: string) => `[Batari] Signup and join ${companyName}`
   },
   WORKSPACE_OWNERSHIP: {
     id: 5102787,
-    subject: (workspaceName: string) =>
-      `[Batari] You are now the manager of ${workspaceName}`
+    subject: (workspaceName: string) => `[Batari] You are now the manager of ${workspaceName}`
   }
 };
 
@@ -85,10 +83,7 @@ export const sendWelcomeEmail = async (user: IUserModelWithId) => {
   });
 };
 
-export const sendForgotPasswordEmail = async (
-  user: IUserModelWithId,
-  token?: string
-) => {
+export const sendForgotPasswordEmail = async (user: IUserModelWithId, token?: string) => {
   const link = `${process.env.MAILJET_BASE_URL}/reset-password/${token}`;
   await sendEmail({
     To: [
@@ -104,9 +99,7 @@ export const sendForgotPasswordEmail = async (
   });
 };
 
-export const sendSuccesfullResetPasswordEmail = async (
-  user: IUserModelWithId
-) => {
+export const sendSuccesfullResetPasswordEmail = async (user: IUserModelWithId) => {
   await sendEmail({
     To: [
       {
@@ -120,11 +113,7 @@ export const sendSuccesfullResetPasswordEmail = async (
   });
 };
 
-export const sendInvitationSignUpEmail = async (
-  email: string,
-  companyName = 'Your Company',
-  token: string
-) => {
+export const sendInvitationSignUpEmail = async (email: string, companyName = 'Your Company', token: string) => {
   const link = `${process.env.MAILJET_BASE_URL}/invitation/${token}`;
   await sendEmail({
     To: [
@@ -138,11 +127,7 @@ export const sendInvitationSignUpEmail = async (
   });
 };
 
-export const sendOwnershipEmail = async (
-  newOwnerEmail: string | undefined,
-  newOwnerName: string | undefined,
-  workspaceName: string
-) => {
+export const sendOwnershipEmail = async (newOwnerEmail: string | undefined, newOwnerName: string | undefined, workspaceName: string) => {
   if (!newOwnerEmail) {
     return;
   }

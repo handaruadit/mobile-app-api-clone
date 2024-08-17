@@ -1,10 +1,4 @@
-import {
-  AnyKeys,
-  startSession,
-  FilterQuery,
-  Query,
-  ClientSession
-} from 'mongoose';
+import { AnyKeys, startSession, FilterQuery, Query, ClientSession } from 'mongoose';
 import type { Types, Model } from 'mongoose';
 
 import { flattenObject } from '@/lib/util';
@@ -14,8 +8,19 @@ interface Action {
 }
 
 export type PopulateSchemaType = {
-  [key: string]: string
-}
+  [key: string]: string;
+};
+
+type FindProps = {
+  filter: FilterQuery<any>;
+  field?: string;
+  order?: string;
+  limit?: number;
+  populate?: boolean | PopulateSchemaType;
+  skip?: number;
+  select?: string;
+  allowDiskUse?: boolean;
+};
 
 export default class Abstract {
   declare model: Model<any>;
@@ -25,11 +30,11 @@ export default class Abstract {
 
   populate = (query: Query<any, any>, schemas?: PopulateSchemaType): Query<any, any> => {
     const selectedSchema = schemas ? schemas : this.schemas;
-    Object.keys(selectedSchema).map((schema) => {
+    Object.keys(selectedSchema).map(schema => {
       query = query.populate(schema, selectedSchema[schema]);
     });
     return query;
-  }
+  };
 
   get = async <T>(id: Types.ObjectId | string, populate?: boolean): Promise<T | undefined> => {
     const query = this.model.findById(id);
@@ -43,6 +48,9 @@ export default class Abstract {
   count = () => this.model.count();
   findOrigin = (o: any) => this.model.find(o);
   findOneAndUpdate = (f: any, u: any) => this.model.findOneAndUpdate(f, u);
+  findWithProp = async <T>(props: FindProps): Promise<T[]> => {
+    return this.find(props.filter, props.field, props.order, props.limit, props.populate, props.skip, props.select, props.allowDiskUse);
+  };
   find = async <T>(
     filter: FilterQuery<any>,
     field = 'createdAt',
@@ -50,7 +58,8 @@ export default class Abstract {
     limit?: number,
     populate?: boolean | PopulateSchemaType,
     skip?: number,
-    select?: string
+    select?: string,
+    allowDiskUse?: boolean
   ): Promise<T[]> => {
     let query = this.model
       .find(filter)
@@ -61,16 +70,16 @@ export default class Abstract {
       query = query.skip(skip);
     }
 
-    if (skip) {
-      query = query.skip(skip);
-    }
-
     if (limit) {
       query = query.limit(limit);
     }
-    
+
     if (populate) {
-      query = this.populate(query, typeof populate != 'boolean' ? populate : undefined)
+      query = this.populate(query, typeof populate != 'boolean' ? populate : undefined);
+    }
+
+    if (allowDiskUse) {
+      query = query.allowDiskUse(true);
     }
 
     return await query.lean();
@@ -86,11 +95,7 @@ export default class Abstract {
     return result;
   };
 
-  update = async <T>(
-    id: string | Types.ObjectId,
-    payload: AnyKeys<any>,
-    overwrite?: boolean
-  ): Promise<T> => {
+  update = async <T>(id: string | Types.ObjectId, payload: AnyKeys<any>, overwrite?: boolean): Promise<T> => {
     const payloadSet = overwrite ? payload : flattenObject(payload);
 
     await this.model.findByIdAndUpdate(id, payloadSet).exec();
@@ -102,21 +107,15 @@ export default class Abstract {
     return result;
   };
 
-  updateWhere = async (
-    where: FilterQuery<any>,
-    payload: AnyKeys<any>,
-    overwrite?: boolean
-  ): Promise<any> => {
+  updateWhere = async (where: FilterQuery<any>, payload: AnyKeys<any>, overwrite?: boolean): Promise<any> => {
     const payloadSet = overwrite ? payload : flattenObject(payload);
 
     return this.model.updateMany(where, payloadSet).exec();
   };
 
-  removeWhere = async (where: FilterQuery<any>): Promise<any> =>
-    this.model.deleteMany(where);
+  removeWhere = async (where: FilterQuery<any>): Promise<any> => this.model.deleteMany(where);
 
-  remove = async (_id: string | Types.ObjectId): Promise<any> =>
-    await this.model.deleteOne({ _id });
+  remove = async (_id: string | Types.ObjectId): Promise<any> => await this.model.deleteOne({ _id });
 
   validate = () => {
     return true;
@@ -130,10 +129,7 @@ export default class Abstract {
     populate?: boolean,
     skip?: number
   ): Promise<[number, T[]]> => {
-    return Promise.all([
-      this.model.count(filter),
-      this.find<T>(filter, field, order, limit, populate, skip)
-    ]);
+    return Promise.all([this.model.count(filter), this.find<T>(filter, field, order, limit, populate, skip)]);
   };
 }
 
@@ -142,7 +138,7 @@ export async function runTransaction(actions: Action[], callback: () => void) {
   session.startTransaction();
 
   try {
-    await Promise.all(actions.map((action) => action(session)));
+    await Promise.all(actions.map(action => action(session)));
     await session.commitTransaction();
     callback();
   } catch (error) {

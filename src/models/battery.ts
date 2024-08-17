@@ -16,48 +16,48 @@ const schema = new Schema(
     },
     description: { type: String },
     brand: { type: String },
-    uuid: { type: String }, // id that is open publicly 
+    uuid: { type: String }, // id that is open publicly
     maxPowerOutput: {
       // in Watts
-      type: Number,
+      type: Number
     },
     capacity: {
       // in MWh
-      type: Number,
+      type: Number
     },
     voltage: {
-       // in MWh
-       type: Number,
+      // in MWh
+      type: Number
     },
-    internalResistance:{
+    internalResistance: {
       // in Ohms
-      type: Number,
+      type: Number
     },
-    selfDischargeRate:{
+    selfDischargeRate: {
       // Rate at which a battery loses its charge when not in use.
-      type: Number,
+      type: Number
     },
     operatingTemperatureRange: {
       min: { type: Number },
-      max: { type: Number },
+      max: { type: Number }
     },
     width: {
       // in m^2
-      type: Number,
+      type: Number
     },
     height: {
       type: Number
     },
     length: {
-      type: Number,
+      type: Number
     },
     weight: {
       // in Kg
-      type: Number,
+      type: Number
     },
     material: {
       // type of battery (e.g., lithium-ion, lead-acid, nickel-metal hydride)
-      type: String,
+      type: String
     },
     warrantyInMonths: { type: Number },
     // IngressProtection/IP Rating
@@ -72,10 +72,7 @@ export type IBatteryModelWithId = IBatteryModel & {
 };
 export type IBatteryModelPopulated = IBatteryModelWithId;
 export type IBatteryModelOutput = StringIds<IBatteryModelWithId>;
-export type IBatteryModelPayload = Omit<
-  IBatteryModel,
-  'createdAt' | 'updatedAt'
->;
+export type IBatteryModelPayload = Omit<IBatteryModel, 'createdAt' | 'updatedAt'>;
 
 class MongooseModel extends Abstract {
   declare model: Model<IBatteryModel>;

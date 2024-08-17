@@ -3,11 +3,7 @@ import { Request } from 'express';
 import { usersDevice } from '@/models';
 import { IUsersDeviceModelWithId } from '@/models/usersDevice';
 
-import {
-  InputProtectedDeviceUpdateBody,
-  OutputProtectedDeviceRead,
-  OutputProtectedDeviceUpdate
-} from '@/interfaces/endpoints/protected/usersDevice';
+import { InputProtectedDeviceUpdateBody, OutputProtectedDeviceRead, OutputProtectedDeviceUpdate } from '@/interfaces/endpoints/protected/usersDevice';
 import { ErrorCodes } from '@/lib/enum';
 import Exception from '@/lib/exception';
 import resource from '@/middleware/resource-router-middleware';
@@ -29,9 +25,7 @@ export default () =>
      *            schema:
      *              "$ref": "./components.yaml#/components/schemas/OutputProtectedDeviceRead"
      */
-    list: async (
-      { jwt }: Request, res
-    ) => {
+    list: async ({ jwt }: Request, res) => {
       try {
         const { deviceId } = jwt;
 

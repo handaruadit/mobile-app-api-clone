@@ -16,10 +16,10 @@ const schema = new Schema(
     },
     description: { type: String },
     brand: { type: String },
-    uuid: { type: String }, // id that is open publicly 
+    uuid: { type: String }, // id that is open publicly
     wattage: {
       // in Watts
-      type: Number,
+      type: Number
     },
     efficiency: {
       // %
@@ -27,41 +27,41 @@ const schema = new Schema(
     },
     capacity: {
       // in MWh
-      type: Number,
+      type: Number
     },
     voltage: {
-       // in MWh
-       type: Number,
+      // in MWh
+      type: Number
     },
-    internalResistance:{
+    internalResistance: {
       // in Ohms
-      type: Number,
+      type: Number
     },
-    temperatureCoefficient:{
+    temperatureCoefficient: {
       // how the panel's performance is affected by temperature changes.
-      type: Number,
+      type: Number
     },
     operatingTemperatureRange: {
       min: { type: Number },
-      max: { type: Number },
+      max: { type: Number }
     },
     width: {
       // in m^2
-      type: Number,
+      type: Number
     },
     height: {
       type: Number
     },
     length: {
-      type: Number,
+      type: Number
     },
     weight: {
       // in Kg
-      type: Number,
+      type: Number
     },
     material: {
       // type of battery (e.g., lithium-ion, lead-acid, nickel-metal hydride)
-      type: String,
+      type: String
     },
     warrantyInMonths: { type: Number },
     // IngressProtection/IP Rating
@@ -76,10 +76,7 @@ export type IPanelModelWithId = IPanelModel & {
 };
 export type IPanelModelPopulated = IPanelModelWithId;
 export type IPanelModelOutput = StringIds<IPanelModelWithId>;
-export type IPanelModelPayload = Omit<
-  IPanelModel,
-  'createdAt' | 'updatedAt'
->;
+export type IPanelModelPayload = Omit<IPanelModel, 'createdAt' | 'updatedAt'>;
 
 class MongooseModel extends Abstract {
   declare model: Model<IPanelModel>;

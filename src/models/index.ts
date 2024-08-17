@@ -9,3 +9,6 @@ export { default as batteryData } from './batteryData';
 export { default as panelData } from './panelData';
 export { default as usersDevice } from './usersDevice';
 export { default as notification } from './notification';
+export { default as batteryAggregate } from './batteryAggregate';
+export { default as inverterAggregate } from './inverterAggregate';
+export { default as panelAggregate } from './panelAggregate';

@@ -1,15 +1,14 @@
-
 /**
  * Workspace is a site where users devices located.
  * a workspace can have multiple devices.
  * a workspace must have an admin.
  */
 import { model, Schema, isValidObjectId } from 'mongoose';
-import type { InferSchemaType, Types, Model } from 'mongoose';
+import type { InferSchemaType, Types, Model, PipelineStage } from 'mongoose';
 
 import Abstract from '@/models/abstract';
 import { IUserMinimalModel } from '@/types';
-import { StringIds } from '@/interfaces/common';
+import { AvailabilityType, StringIds } from '@/interfaces/common';
 import { Entities, Roles, ValidationErrorCodes } from '@/lib/enum';
 import { IDeviceModelWithId } from './device';
 import { ExpressAccount } from '@/types/express';
@@ -35,7 +34,7 @@ const schema = new Schema(
       coordinates: [Number, Number]
     },
     language: {
-      type: String,
+      type: String
     },
     timezone: {
       type: String,
@@ -101,10 +100,7 @@ export type IWorkspaceModelWithId = IWorkspaceModel & {
   })[];
 };
 export type IWorkspaceModelOutput = StringIds<IWorkspaceModelWithId>;
-export type IWorkspaceModelPayload = Omit<
-  IWorkspaceModel,
-  'createdAt' | 'updatedAt' | 'members' | 'ownerId'
-> & {
+export type IWorkspaceModelPayload = Omit<IWorkspaceModel, 'createdAt' | 'updatedAt' | 'members' | 'ownerId'> & {
   members?: IWorkspaceModel['members'];
   ownerId?: IWorkspaceModel['ownerId'];
 };
@@ -120,7 +116,7 @@ class MongooseModel extends Abstract {
       _owner: '', // default to take all fields
       _members: '',
       _device: ''
-    } 
+    };
   }
 
   defineModel = () => {
@@ -154,14 +150,14 @@ class MongooseModel extends Abstract {
             $elemMatch: {
               entity: Entities.WORKSPACE,
               role: {
-                $in: roles ?? [Roles.READ, Roles.WRITE, Roles.ADMIN],
-              },
-            },
-          },
-        },
-      },
-    }
-  }
+                $in: roles ?? [Roles.READ, Roles.WRITE, Roles.ADMIN]
+              }
+            }
+          }
+        }
+      }
+    };
+  };
 
   findWorkspacesOfUser = async (
     userId: Types.ObjectId | string,
@@ -169,7 +165,7 @@ class MongooseModel extends Abstract {
     onlyOwner?: boolean,
     select?: string
   ): Promise<IWorkspaceModelWithId[]> => {
-    const pipeline: any[] = [ { ownerId: userId } ];
+    const pipeline: any[] = [{ ownerId: userId }];
     if (!onlyOwner) {
       pipeline.push({
         members: {
@@ -187,22 +183,31 @@ class MongooseModel extends Abstract {
         }
       });
     }
-    return await this.find<IWorkspaceModelWithId>({
-      $or: pipeline
-    }, undefined, undefined, undefined, false, undefined, select);
-  }
+    return await this.find<IWorkspaceModelWithId>(
+      {
+        $or: pipeline
+      },
+      undefined,
+      undefined,
+      undefined,
+      false,
+      undefined,
+      select
+    );
+  };
 
-  filterDevice = (state)=>{
-    const modifier = {
+  // state: online or offline
+  filterDevice = (state: AvailabilityType): PipelineStage[] => {
+    const modifier: { [key: string]: PipelineStage[] } = {
       online: [
         {
-          $lookup:{
-            from: 'batterydatas',
+          $lookup: {
+            from: 'paneldatas',
             localField: '_id',
             foreignField: 'siteId',
-            pipeline:[
+            pipeline: [
               {
-                $sort:{
+                $sort: {
                   sentAt: -1
                 }
               },
@@ -210,15 +215,15 @@ class MongooseModel extends Abstract {
                 $limit: 1
               },
               {
-                $project:{
-                  lastPing:{
-                    $dateDiff:{
-                      startDate: "$createdAt",
-                      endDate: "$$NOW",
-                      unit: "minute"
+                $project: {
+                  lastPing: {
+                    $dateDiff: {
+                      startDate: '$createdAt',
+                      endDate: '$$NOW',
+                      unit: 'minute'
                     }
                   },
-                  status: "online"
+                  status: 'online'
                   // /* Debugging Parameters */
                   // sentAt: "$sentAt",
                   // datenow: "$$NOW",
@@ -226,19 +231,19 @@ class MongooseModel extends Abstract {
                 }
               },
               {
-                $match:{
-                  lastPing:{
+                $match: {
+                  lastPing: {
                     $lte: 2 // 2 minutes
                   }
                 }
               }
             ],
-            as: "devicePingStatus"
+            as: 'devicePingStatus'
           }
         },
         {
-          $match:{
-            devicePingStatus:{
+          $match: {
+            devicePingStatus: {
               $ne: []
             }
           }
@@ -246,13 +251,13 @@ class MongooseModel extends Abstract {
       ],
       offline: [
         {
-          $lookup:{
-            from: 'batterydatas',
+          $lookup: {
+            from: 'paneldatas',
             localField: '_id',
             foreignField: 'siteId',
-            pipeline:[
+            pipeline: [
               {
-                $sort:{
+                $sort: {
                   sentAt: -1
                 }
               },
@@ -260,15 +265,15 @@ class MongooseModel extends Abstract {
                 $limit: 1
               },
               {
-                $project:{
-                  lastPing:{
-                    $dateDiff:{
-                      startDate: "$createdAt",
-                      endDate: "$$NOW",
-                      unit: "minute"
+                $project: {
+                  lastPing: {
+                    $dateDiff: {
+                      startDate: '$createdAt',
+                      endDate: '$$NOW',
+                      unit: 'minute'
                     }
                   },
-                  status: "offline"
+                  status: 'offline'
                   // /* Debugging Parameters */
                   // sentAt: "$sentAt",
                   // datenow: "$$NOW",
@@ -276,28 +281,45 @@ class MongooseModel extends Abstract {
                 }
               },
               {
-                $match:{
-                  lastPing:{
+                $match: {
+                  lastPing: {
                     $gt: 2 // 2 minutes
                   }
                 }
               }
             ],
-            as: "devicePingStatus"
+            as: 'devicePingStatus'
           }
         },
         {
-          $match:{
-            devicePingStatus:{
+          $match: {
+            devicePingStatus: {
               $ne: []
             }
           }
         }
+      ],
+      unlinked: [
+        {
+          $lookup: {
+            from: 'paneldatas',
+            localField: '_id',
+            foreignField: 'siteId',
+            as: 'devicePingStatus'
+          }
+        },
+        {
+          $match: {
+            devicePingStatus: {
+              $eq: []
+            }
+          }
+        }
       ]
-    }
+    };
 
-    return modifier[state]
-  }
+    return modifier[state];
+  };
 }
 
 const inst = new MongooseModel();

@@ -1,3 +1,10 @@
+export interface MonthlySavingsType {
+  [x: string]: {
+    total?: number;
+    weather?: string;
+  };
+}
+
 export interface IDashboardOutput {
   workspaces?: {
     _id: string;
@@ -14,12 +21,7 @@ export interface IDashboardOutput {
   };
   workspaceId?: string;
   name?: string;
-  savings?: { 
-    [key: string]: {
-      total?: number;
-      weather?: string;
-    };
-  };
+  savings?: MonthlySavingsType;
   batteryDischarged?: number;
   panelOutput?: number;
   greenstats?: {
@@ -27,4 +29,5 @@ export interface IDashboardOutput {
     coalSaved?: number;
     deforestationReduced?: number;
   };
+  workspaceData?: IDashboardOutput[];
 }

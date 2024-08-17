@@ -101,8 +101,8 @@ export interface OutputPublicDeviceInfoList {
     domains: {
       count: number | null;
       domains: string[];
-    }
-  }
+    };
+  };
 }
 
 export interface OutputPublicRegisterCreate {

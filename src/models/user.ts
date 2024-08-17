@@ -50,7 +50,7 @@ const schema = new Schema(
         type: String,
         default: 'id'
       }
-    },
+    }
   },
   { timestamps: true }
 );

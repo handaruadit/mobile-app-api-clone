@@ -7,11 +7,7 @@ import { OutputPublicRegisterCreate } from '@/interfaces/endpoints/public/regist
 import { IPublicRegisterPayload } from '@/interfaces/output';
 import { ErrorCodes } from '@/lib/enum';
 import Exception from '@/lib/exception';
-import {
-  getDeviceIpInformation,
-  ipbaseLocationToDeviceLocation,
-  updateDeviceList
-} from '@/lib/ipbase';
+import { getDeviceIpInformation, ipbaseLocationToDeviceLocation, updateDeviceList } from '@/lib/ipbase';
 import resource from '@/middleware/resource-router-middleware';
 
 export default () =>
@@ -21,10 +17,7 @@ export default () =>
      * check if uuid doesn't exist then create new record with empty list.
      * if exist and ip doesn't exist in the list, then hit ip information API and append it to the list.
      */
-    post: async (
-      { body, account }: Request & { body: IPublicRegisterPayload },
-      res
-    ) => {
+    post: async ({ body, account }: Request & { body: IPublicRegisterPayload }, res) => {
       try {
         const payload: IPublicRegisterPayload = body;
         const { uuid, ip } = payload;

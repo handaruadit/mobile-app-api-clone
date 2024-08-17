@@ -15,15 +15,9 @@ import { ErrorCodes } from './enum';
  * @param ip - The IP address to retrieve information for.
  * @returns A promise that resolves to an array containing the response data and any error.
  */
-export const getDeviceIpInformation = async (
-  ip: string
-): Promise<
-  [response: OutputPublicDeviceInfoList | null, error: string | null]
-> => {
+export const getDeviceIpInformation = async (ip: string): Promise<[response: OutputPublicDeviceInfoList | null, error: string | null]> => {
   try {
-    const response = await axios.get<OutputPublicDeviceInfoList>(
-      `https://api.ipbase.com/v2/info?apikey=${process.env.IPBASE_API_KEY}&ip=${ip}`
-    );
+    const response = await axios.get<OutputPublicDeviceInfoList>(`https://api.ipbase.com/v2/info?apikey=${process.env.IPBASE_API_KEY}&ip=${ip}`);
     return [response.data, null];
   } catch (error) {
     console.error(error);
@@ -31,9 +25,7 @@ export const getDeviceIpInformation = async (
   }
 };
 
-export const ipbaseLocationToDeviceLocation = ({
-  data: newLocation
-}: OutputPublicDeviceInfoList) => {
+export const ipbaseLocationToDeviceLocation = ({ data: newLocation }: OutputPublicDeviceInfoList) => {
   return {
     ip: newLocation.ip,
     country: newLocation.location?.country?.name,
@@ -47,11 +39,7 @@ export const ipbaseLocationToDeviceLocation = ({
   };
 };
 
-export const updateDeviceList = async (
-  ip: string,
-  data: IUsersDeviceModelWithId,
-  payload?: IPublicRefreshPayload
-) => {
+export const updateDeviceList = async (ip: string, data: IUsersDeviceModelWithId, payload?: IPublicRefreshPayload) => {
   const [newLocation, error] = await getDeviceIpInformation(ip);
   let updated: IUsersDeviceModelWithId | null = null;
 

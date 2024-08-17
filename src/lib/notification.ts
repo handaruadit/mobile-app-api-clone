@@ -24,8 +24,8 @@ export default class Notification {
 
   async sendMessage(devices: IUsersDeviceModelPayload[], message: BaseMessage, useNotifeePayload = true) {
     const tokens: string[] = [];
-    devices.forEach((device) => {
-      if(device.fcmToken) {
+    devices.forEach(device => {
+      if (device.fcmToken) {
         tokens.push(device.fcmToken);
       }
     });

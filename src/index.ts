@@ -13,6 +13,7 @@ import autorizationMiddleware from '@/middleware/authorization-middleware';
 
 import initializeDb from './db';
 import MQTT from './lib/mqtt';
+import { startCronJobs } from './cronAggregate';
 
 const app = express();
 
@@ -44,6 +45,8 @@ initializeDb()
       return;
     }
 
+    startCronJobs();
+
     // api router
     app.use('/api', api({ config, client, db }));
 
@@ -55,7 +58,7 @@ initializeDb()
 
     console.log(`Started on port ${port}`);
   })
-  .catch((err) => {
+  .catch(err => {
     console.error(err);
     mqtt.closeConnection();
   });

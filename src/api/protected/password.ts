@@ -34,10 +34,7 @@ export default () =>
      */
     put: async ({ body, account, params }, res) => {
       const { id } = params;
-      const {
-        password,
-        newPassword
-      }: { password: string; newPassword: string } = body;
+      const { password, newPassword }: { password: string; newPassword: string } = body;
 
       if (!account._id.equals(id)) {
         Exception.unauthorized(res, ErrorCodes.USER_NOT_AUTHORIZED);

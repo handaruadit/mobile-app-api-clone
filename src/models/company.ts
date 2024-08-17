@@ -43,10 +43,7 @@ export type ICompanyModelWithId = ICompanyModel & {
   _id: Types.ObjectId;
 };
 export type ICompanyModelOutput = StringIds<ICompanyModelWithId>;
-export type ICompanyModelPayload = Omit<
-  ICompanyModel,
-  'createdAt' | 'updatedAt'
->;
+export type ICompanyModelPayload = Omit<ICompanyModel, 'createdAt' | 'updatedAt'>;
 
 class MongooseModel extends Abstract {
   declare model: Model<ICompanyModel>;

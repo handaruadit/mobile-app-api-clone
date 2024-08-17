@@ -53,18 +53,12 @@ export default () =>
         return;
       }
 
-      const companyItem = await company.get<ICompanyModelWithId>(
-        account.companyId ?? ''
-      );
+      const companyItem = await company.get<ICompanyModelWithId>(account.companyId ?? '');
 
       res.json({
         code: ReturnCodes.INVITATION_SENT
       } satisfies OutputProtectedWorkspaceInvitationResendPut);
-      sendInvitationSignUpEmail(
-        token.userEmail,
-        companyItem?.name ?? '',
-        token.token
-      ).catch(console.error);
+      sendInvitationSignUpEmail(token.userEmail, companyItem?.name ?? '', token.token).catch(console.error);
       return;
     }
   });

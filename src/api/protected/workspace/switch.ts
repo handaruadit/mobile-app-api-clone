@@ -1,9 +1,6 @@
 import { isValidObjectId } from 'mongoose';
 
-import {
-  workspace as entity,
-  user as entityUser,
-} from '@/models';
+import { workspace as entity, user as entityUser } from '@/models';
 import { IUserModelWithId } from '@/models/user';
 import { IWorkspaceModelWithId as IEntityModel } from '@/models/workspace';
 
@@ -77,8 +74,7 @@ export default () =>
       // User already exist
       const userAlreadyExistInWorkspace =
         // company.ownerId?.equals(userId) ||
-        item.ownerId?.equals(userId) ||
-        item.members?.some(({ id }) => id?.equals(userId));
+        item.ownerId?.equals(userId) || item.members?.some(({ id }) => id?.equals(userId));
 
       if (!userAlreadyExistInWorkspace) {
         Exception.notFound(res, ErrorCodes.USER_NOT_FOUND_IN_WORKSPACE);
@@ -90,9 +86,7 @@ export default () =>
         workspaceId: id
       });
 
-      res
-        .status(200)
-        .json({ tokens } satisfies OutputProtectedWorkspaceSwitchPut);
+      res.status(200).json({ tokens } satisfies OutputProtectedWorkspaceSwitchPut);
       return;
     }
   });

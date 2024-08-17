@@ -1,6 +1,6 @@
 import { IBaseUserEntity, ReturnCodes } from '@/types';
 
-export interface IAdminPostUserOutput extends IBaseUserEntity {};
+export type IAdminPostUserOutput = IBaseUserEntity;
 export interface IAdminListUserOutput {
   data: IBaseUserEntity[];
   offset?: number;
@@ -9,8 +9,8 @@ export interface IAdminListUserOutput {
   total: number;
 }
 
-export interface IAdminPutUserOutput extends IBaseUserEntity {};
-export interface IAdminReadUserOutput extends IBaseUserEntity {};
+export type IAdminPutUserOutput = IBaseUserEntity;
+export type IAdminReadUserOutput = IBaseUserEntity;
 export interface IAdminDeleteUserOutput {
-  code: ReturnCodes
-};
+  code: ReturnCodes;
+}

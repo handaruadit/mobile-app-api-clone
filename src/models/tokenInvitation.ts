@@ -64,8 +64,7 @@ export type ITokenInvitationModel = InferSchemaType<typeof schema>;
 export type ITokenInvitationModelWithId = ITokenInvitationModel & {
   _id: Types.ObjectId;
 };
-export type ITokenInvitationModelOutput =
-  StringIds<ITokenInvitationModelWithId>;
+export type ITokenInvitationModelOutput = StringIds<ITokenInvitationModelWithId>;
 
 class MongooseModel extends Abstract {
   declare model: Model<ITokenInvitationModel>;

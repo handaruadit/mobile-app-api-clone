@@ -25,10 +25,7 @@ export interface ITokenPayloadWithJwt {
   jwt: JWTDecodedOutput;
 }
 
-export const isTokenValid = async (
-  headers: IncomingHttpHeaders,
-  type: 'access' | 'refresh'
-): Promise<ITokenPayloadWithJwt | undefined> => {
+export const isTokenValid = async (headers: IncomingHttpHeaders, type: 'access' | 'refresh'): Promise<ITokenPayloadWithJwt | undefined> => {
   const token = headers['authorization'];
   const payload = authenticateToken(token, type);
   if (!payload?.id) {
@@ -68,7 +65,7 @@ export const isTokenValid = async (
   // });
 
   const account = {
-    ...acc,
+    ...acc
     // companyId: workspacesOfUser?.companyId?.toString(),
     // workspaceId: workspacesOfUser?._id?.toString()
   };

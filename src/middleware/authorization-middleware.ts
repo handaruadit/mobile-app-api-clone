@@ -19,9 +19,8 @@ export default async (req: Request, res: Response, next: NextFunction) => {
     req.account = account;
   } else if (isRefreshTokenPath) {
     try {
-      console.log("REFRESHING")
-      const { account, jwt } =
-        (await isTokenValid(req.headers, 'refresh')) ?? {};
+      console.log('REFRESHING');
+      const { account, jwt } = (await isTokenValid(req.headers, 'refresh')) ?? {};
 
       if (!account || !jwt) {
         Exception.unauthorized(res);
@@ -34,8 +33,7 @@ export default async (req: Request, res: Response, next: NextFunction) => {
     }
   } else if (isProtected) {
     try {
-      const { account, jwt } =
-        (await isTokenValid(req.headers, 'access')) ?? {};
+      const { account, jwt } = (await isTokenValid(req.headers, 'access')) ?? {};
 
       if (!account || !jwt) {
         Exception.unauthorized(res);
@@ -46,8 +44,7 @@ export default async (req: Request, res: Response, next: NextFunction) => {
       req.jwt = jwt;
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
-      const errorName: string =
-        error.name === 'TokenExpiredError' ? error.name : undefined;
+      const errorName: string = error.name === 'TokenExpiredError' ? error.name : undefined;
       Exception.unauthorized(res, errorName);
       return;
     }

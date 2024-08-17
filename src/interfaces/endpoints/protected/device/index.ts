@@ -1,4 +1,4 @@
-import { IOutputDevice, ReturnCodes } from "@/types";
+import { IOutputDevice, ReturnCodes } from '@/types';
 
 export interface IProtectedPostDeviceBody {
   name: string;

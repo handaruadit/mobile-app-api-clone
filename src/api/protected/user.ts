@@ -3,11 +3,7 @@ import { isValidObjectId } from 'mongoose';
 
 import { user as entity } from '@/models';
 import { IUserModelWithId as IEntityModel } from '@/models/user';
-import {
-  InputProtectedUserPutBody,
-  OutputProtectedUserList,
-  OutputProtectedUserPut
-} from '@/types';
+import { InputProtectedUserPutBody, OutputProtectedUserList, OutputProtectedUserPut } from '@/types';
 
 import Exception from '@/lib/exception';
 import resource from '@/middleware/resource-router-middleware';
@@ -54,10 +50,7 @@ export default () =>
      *          schema:
      *            "$ref": "./components.yaml#/components/schemas/OutputProtectedPasswordPut"
      */
-    put: async (
-      { body, account, params }: Request & { body: InputProtectedUserPutBody },
-      res
-    ) => {
+    put: async ({ body, account, params }: Request & { body: InputProtectedUserPutBody }, res) => {
       const { id } = params;
 
       if (account._id.toString() !== id.toString()) {

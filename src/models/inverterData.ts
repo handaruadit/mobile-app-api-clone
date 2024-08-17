@@ -17,34 +17,34 @@ const schema = new Schema(
       required: true,
       ref: 'Workspace'
     },
-    deviceId:  {
+    deviceId: {
       type: Schema.Types.ObjectId,
       required: true,
       // required: [true, ValidationErrorCodes.WORKSPACE_IS_REQUIRED],
-      ref: 'Device',
+      ref: 'Device'
     },
     metadata: { type: Object },
     acVoltageIn: {
-      type: Number, // unit: volts
+      type: Number // unit: volts
     },
-    acCurrentIn:  {
-      type: Number, // unit: amperes
+    acCurrentIn: {
+      type: Number // unit: amperes
     },
-    acPowerIn:  {
-      type: Number, // unit: watts
+    acPowerIn: {
+      type: Number // unit: watts
     },
     acVoltageOut: {
-      type: Number, // unit: volts
+      type: Number // unit: volts
     },
-    acCurrentOut:  {
-      type: Number, // unit: amperes
+    acCurrentOut: {
+      type: Number // unit: amperes
     },
-    acPowerOut:  {
-      type: Number, // unit: watts
+    acPowerOut: {
+      type: Number // unit: watts
     },
 
     timezone: {
-      type: String,
+      type: String
       // required: [true, ValidationErrorCodes.TIMEZONE_REQUIRED]
     },
     isOnline: {
@@ -54,14 +54,14 @@ const schema = new Schema(
       type: Date,
       required: true,
       default: new Date()
-    },
+    }
   },
   {
     timestamps: true,
     timeseries: {
       timeField: 'sentAt',
       metaField: 'metadata',
-      granularity: 'seconds',
+      granularity: 'seconds'
     }
   }
 );
@@ -71,10 +71,7 @@ export type IInverterDataModelWithId = IInverterDataModel & {
   _id: Types.ObjectId;
 };
 export type IInverterDataModelOutput = StringIds<IInverterDataModelWithId>;
-export type IInverterDataModelPayload = Omit<
-  IInverterDataModel,
-  'createdAt' | 'updatedAt'
->;
+export type IInverterDataModelPayload = Omit<IInverterDataModel, 'createdAt' | 'updatedAt'>;
 
 class MongooseModel extends Abstract {
   declare model: Model<IInverterDataModel>;
@@ -90,17 +87,17 @@ class MongooseModel extends Abstract {
   };
 
   /**
-   * 
-   * @param deviceIds 
+   *
+   * @param deviceIds
    * @param days days 0 means it's only today
-   * @param timezone 
-   * @returns 
+   * @param timezone
+   * @returns
    */
   getMainStats = async (
     deviceIds: string[] | Types.ObjectId[],
     uuids: string[] | Types.ObjectId[],
     days: number,
-    timezone: string = 'Asia/Jakarta'
+    timezone = 'Asia/Jakarta'
   ): Promise<OutputMainInverterData> => {
     const todayStart = moment().tz(timezone).subtract(days, 'days').startOf('day');
 
@@ -114,10 +111,10 @@ class MongooseModel extends Abstract {
     const matchPipeline: any = {
       sentAt: { $gte: todayStart.toDate() },
       deviceId: { $in: deviceIds }
-    }
+    };
     if (uuids.length) {
       matchPipeline.uuid = { $in: uuids };
-    };
+    }
     const pipeline = [
       {
         $match: matchPipeline
@@ -125,32 +122,32 @@ class MongooseModel extends Abstract {
       {
         $group: {
           _id: null,
-          totalPowerIn: { $sum: "$acPowerIn" },
-          averagePowerIn: { $avg: "$acPowerIn" },
-          totalPowerOut: { $sum: "$acPowerOut" },
-          averagePowerOut: { $avg: "$acPowerOut" },
-          totalConsumption: { $sum: "$acPowerOut" },
-          averageConsumption: { $avg: "$acPowerOut" },
-          totalAcVoltageIn: { $sum: "$acVoltageIn" },
-          averageAcVoltageIn: { $avg: "$acVoltageIn" },
-          totalAcVoltageOut: { $sum: "$acVoltageOut" },
-          averageAcVoltageOut: { $avg: "$acVoltageOut" },
-          totalAcCurrenctIn: { $sum: "$acCurrenctIn" },
-          averageAcCurrenctIn: { $avg: "$acCurrenctIn" },
-          totalAcCurrentOut: { $sum: "$acCurrentOut" },
-          averageAcCurrentOut: { $avg: "$acCurrentOut" }
+          totalPowerIn: { $sum: '$acPowerIn' },
+          averagePowerIn: { $avg: '$acPowerIn' },
+          totalPowerOut: { $sum: '$acPowerOut' },
+          averagePowerOut: { $avg: '$acPowerOut' },
+          totalConsumption: { $sum: '$acPowerOut' },
+          averageConsumption: { $avg: '$acPowerOut' },
+          totalAcVoltageIn: { $sum: '$acVoltageIn' },
+          averageAcVoltageIn: { $avg: '$acVoltageIn' },
+          totalAcVoltageOut: { $sum: '$acVoltageOut' },
+          averageAcVoltageOut: { $avg: '$acVoltageOut' },
+          totalAcCurrenctIn: { $sum: '$acCurrenctIn' },
+          averageAcCurrenctIn: { $avg: '$acCurrenctIn' },
+          totalAcCurrentOut: { $sum: '$acCurrentOut' },
+          averageAcCurrentOut: { $avg: '$acCurrentOut' }
         }
       }
     ];
 
     const result = await this.model.aggregate(pipeline);
     return result ? result[0] : {};
-  }
+  };
 
   // TODO
-  getTimeseriesData = async (deviceIds: string[] | Types.ObjectId[], hours?: number, timezone: string = 'UTC') => {
+  getTimeseriesData = async (deviceIds: string[] | Types.ObjectId[], hours?: number, timezone = 'UTC') => {
     const filterDate = moment().tz(timezone).subtract(hours, 'hours').toDate();
-    
+
     return await this.find<IInverterDataModelWithId>(
       {
         sentAt: { $gte: filterDate },
@@ -163,7 +160,7 @@ class MongooseModel extends Abstract {
       undefined,
       'deviceId sentAt acCurrentIn acPowerIn acVoltageIn acCurrentOut acPowerOut acVoltageOut temperature heatIndex humidity createdAt'
     );
-  }
+  };
 
   // populate = (query: Query<any, any>) =>
   //   query

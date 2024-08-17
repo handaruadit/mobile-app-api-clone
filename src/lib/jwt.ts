@@ -7,13 +7,7 @@ import { IDeviceModelWithId } from '@/models/device';
 
 export type WorkspacesPermissions = Record<string, IOutputWorkspacePermission[]>;
 
-export const generateDeviceToken = ({
-  device,
-  type = 'access'
-}: {
-  device: IDeviceModelWithId;
-  type: 'access' | 'refresh';
-}) => {
+export const generateDeviceToken = ({ device, type = 'access' }: { device: IDeviceModelWithId; type: 'access' | 'refresh' }) => {
   const payload: JWTDecodedOutput = {
     iss: 'batari',
     deviceId: device._id.toString()
@@ -21,24 +15,13 @@ export const generateDeviceToken = ({
 
   const expiresIn = type === 'access' ? '1800s' : '7d';
 
-  return jsonwebtoken.sign(
-    payload,
-    (type === 'access'
-      ? process.env.JWT_SECRET
-      : process.env.JWT_REFRESH_SECRET) ?? '',
-    {
-      expiresIn,
-      algorithm: 'HS256'
-    }
-  );
+  return jsonwebtoken.sign(payload, (type === 'access' ? process.env.JWT_SECRET : process.env.JWT_REFRESH_SECRET) ?? '', {
+    expiresIn,
+    algorithm: 'HS256'
+  });
 };
 
-export const generateJwtTokens = async ({
-  user
-}: {
-  user: IUserModelWithId;
-  workspaceId?: string;
-}) => {
+export const generateJwtTokens = async ({ user }: { user: IUserModelWithId; workspaceId?: string }) => {
   const accessToken = generateJwtToken({
     user,
     type: 'access'
@@ -51,14 +34,7 @@ export const generateJwtTokens = async ({
   return { accessToken, refreshToken };
 };
 
-export const generateJwtToken = ({
-  user,
-  type = 'access'
-}: {
-  user: IUserModelWithId;
-  workspace?: WorkspacesPermissions;
-  type: 'access' | 'refresh';
-}) => {
+export const generateJwtToken = ({ user, type = 'access' }: { user: IUserModelWithId; workspace?: WorkspacesPermissions; type: 'access' | 'refresh' }) => {
   const payload: JWTDecodedOutput = {
     iss: 'batari',
     id: user._id.toString(),
@@ -69,34 +45,20 @@ export const generateJwtToken = ({
 
   const expiresIn = type === 'access' ? '1800s' : '7d';
 
-  return jsonwebtoken.sign(
-    payload,
-    (type === 'access'
-      ? process.env.JWT_SECRET
-      : process.env.JWT_REFRESH_SECRET) ?? '',
-    {
-      expiresIn,
-      algorithm: 'HS256'
-    }
-  );
+  return jsonwebtoken.sign(payload, (type === 'access' ? process.env.JWT_SECRET : process.env.JWT_REFRESH_SECRET) ?? '', {
+    expiresIn,
+    algorithm: 'HS256'
+  });
 };
 
-export const authenticateToken = (
-  authHeader?: string,
-  type: 'access' | 'refresh' = 'access'
-): JWTDecodedOutput | undefined => {
+export const authenticateToken = (authHeader?: string, type: 'access' | 'refresh' = 'access'): JWTDecodedOutput | undefined => {
   const token = authHeader && authHeader.split(' ')[1];
 
   if (!token) {
     return;
   }
 
-  const payload = jsonwebtoken.verify(
-    token,
-    (type === 'access'
-      ? process.env.JWT_SECRET
-      : process.env.JWT_REFRESH_SECRET) ?? ''
-  );
+  const payload = jsonwebtoken.verify(token, (type === 'access' ? process.env.JWT_SECRET : process.env.JWT_REFRESH_SECRET) ?? '');
 
   return payload as JWTDecodedOutput;
 };

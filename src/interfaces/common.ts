@@ -9,3 +9,7 @@ export type StringIds<T> = T extends Types.ObjectId
       [K in keyof T]: StringIds<T[K]>;
     }
   : T;
+
+export type AvailabilityType = 'online' | 'offline' | 'unlinked';
+
+export type ITimeseriesAggregate = 'realtime' | 'minute' | 'hour' | 'day' | 'week';

@@ -15,17 +15,9 @@ export const checkJWTPermissions = ({
     return jwt?.workspace?.owner === true;
   }
 
-  const userEntityPermissions = jwt?.permissions?.find(
-    (permission) => permission.entity === entity
-  );
+  const userEntityPermissions = jwt?.permissions?.find(permission => permission.entity === entity);
 
-  const hasPermission =
-    jwt &&
-    userEntityPermissions &&
-    permissions?.includes(userEntityPermissions.role);
+  const hasPermission = jwt && userEntityPermissions && permissions?.includes(userEntityPermissions.role);
 
-  return (
-    jwt?.workspace?.owner === true ||
-    hasPermission === true
-  );
+  return jwt?.workspace?.owner === true || hasPermission === true;
 };

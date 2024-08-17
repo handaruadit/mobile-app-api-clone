@@ -15,16 +15,9 @@ class Exception {
     };
   }
 
-  parseError(
-    res: Response,
-    error: Error | number | unknown,
-    code = 'ServerError',
-    payload?: Record<string, any>
-  ) {
+  parseError(res: Response, error: Error | number | unknown, code = 'ServerError', payload?: Record<string, any>) {
     if (error instanceof MongooseError.ValidationError) {
-      const errors: ValidationErrorCodes[] = Object.values(error.errors).map(
-        (error: any) => error.message
-      );
+      const errors: ValidationErrorCodes[] = Object.values(error.errors).map((error: any) => error.message);
       this.notValid(res, ErrorCodes.VALIDATION_ERROR, errors);
       return;
     }
@@ -46,11 +39,7 @@ class Exception {
     this.serverError(res, code, payload, error);
   }
 
-  unauthorized(
-    res: Response,
-    code = 'Unauthorized',
-    payload?: Record<string, any>
-  ) {
+  unauthorized(res: Response, code = 'Unauthorized', payload?: Record<string, any>) {
     res.status(401).json({ error: { code, payload } });
   }
 
@@ -78,12 +67,7 @@ class Exception {
     res.status(204);
   }
 
-  serverError(
-    res: Response,
-    code = 'ServerError',
-    payload?: Record<string, any>,
-    error?: Error | number | unknown
-  ) {
+  serverError(res: Response, code = 'ServerError', payload?: Record<string, any>, error?: Error | number | unknown) {
     console.log(error);
     res.status(500).json(this.formatReturnedError(code, payload));
   }

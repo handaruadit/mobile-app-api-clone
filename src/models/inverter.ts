@@ -16,14 +16,14 @@ const schema = new Schema(
     },
     description: { type: String },
     brand: { type: String },
-    uuid: { type: String }, // id that is open publicly 
+    uuid: { type: String }, // id that is open publicly
     maxPowerOutput: {
       // in Watts
-      type: Number,
+      type: Number
     },
     maxDcVoltage: {
       // in Watts
-      type: Number,
+      type: Number
     },
     efficiency: {
       // %
@@ -31,21 +31,21 @@ const schema = new Schema(
     },
     operatingTemperatureRange: {
       min: { type: Number },
-      max: { type: Number },
+      max: { type: Number }
     },
     width: {
       // in m^2
-      type: Number,
+      type: Number
     },
     height: {
       type: Number
     },
     length: {
-      type: Number,
+      type: Number
     },
     weight: {
       // in Kg
-      type: Number,
+      type: Number
     },
     warrantyInMonths: { type: Number },
     // IngressProtection/IP Rating
@@ -60,10 +60,7 @@ export type IInverterModelWithId = IInverterModel & {
 };
 export type IInverterModelPopulated = IInverterModelWithId;
 export type IInverterModelOutput = StringIds<IInverterModelWithId>;
-export type IInverterModelPayload = Omit<
-  IInverterModel,
-  'createdAt' | 'updatedAt'
->;
+export type IInverterModelPayload = Omit<IInverterModel, 'createdAt' | 'updatedAt'>;
 
 class MongooseModel extends Abstract {
   declare model: Model<IInverterModel>;

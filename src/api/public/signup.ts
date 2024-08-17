@@ -34,11 +34,7 @@ export default () =>
      */
     post: async ({ body }, res) => {
       try {
-        const {
-          email,
-          password,
-          name
-        }: { email: string; password: string; name: string } = body;
+        const { email, password, name }: { email: string; password: string; name: string } = body;
         // simple check
         const isLong = isLength(password, { min: 6 });
 
@@ -53,11 +49,11 @@ export default () =>
           name
         };
         const user = await entity.create<IUserModelWithId>(payload);
-  
+
         const tokens = await generateJwtTokens({ user });
-  
+
         res.status(201).json({ tokens } satisfies OutputPublicSignupPost);
-  
+
         // addContact(user).catch(console.error);
         // sendWelcomeEmail(user).catch(console.error);
       } catch (error) {

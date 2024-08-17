@@ -1,15 +1,12 @@
 import { isValidObjectId } from 'mongoose';
 
-import {
-  device as deviceEntity,
-  workspace as workspaceEntity
-} from '@/models';
+import { device as deviceEntity, workspace as workspaceEntity } from '@/models';
 
 import { ErrorCodes } from '@/lib/enum';
 import Exception from '@/lib/exception';
 import resource from '@/middleware/resource-router-middleware';
-import { OutputProtectedTimeseriesData } from '@/interfaces/endpoints/protected/workspace/main-data';
-import { getTimeseriesData } from '@/lib/statistics';
+import { ITimeseriesStatsOutput } from '@/types';
+import TimeseriesProcessor from '@/batari/TimeseriesProcessor';
 
 export default () =>
   resource({
@@ -27,7 +24,18 @@ export default () =>
      * @openapi
      * /protected/workspace/tdata:
      *  get:
-     *    description: /workspace get all devices timeseries data in all workspaces
+     *    description:
+     *      /workspace get all devices timeseries data in all workspaces
+     *      should handle:
+     *        - realtime data in 30 minutes range
+     *        - data in the last 24 hour
+     *        - daily data in the last 7 days
+     *        - data in a month
+     *      should give data about:
+     *        - power generated (required) / panel
+     *        - power usage / inverter out
+     *        - battery charged / current in
+     *        - battery out / current out
      *    tags:
      *      - protected
      *    responses:
@@ -35,30 +43,35 @@ export default () =>
      *        content:
      *         application/json:
      *          schema:
-     *            "$ref": "./components.yaml#/components/schemas/OutputProtectedTimeseriesData"
+     *            "$ref": "./components.yaml#/components/schemas/ITimeseriesStatsOutput"
      */
     list: async ({ account, query }, res) => {
       try {
-        // 0 days mean only today
-        const { fromLastDays = '0', fromLastHour } = query;
-        if (typeof fromLastDays !== 'string' || (fromLastHour && typeof fromLastHour !== 'string')) {
+        const { startTime, endTime: endTimeQuery } = query;
+
+        if (typeof startTime !== 'string' || (endTimeQuery && typeof endTimeQuery !== 'string')) {
           Exception.notValid(res, ErrorCodes.INVALID_REQUEST);
           return;
         }
-        const devices = await deviceEntity.findUsersDevices(account._id);
-        const ids = devices.map((device) => device._id);
-    
-        const parsedDays = parseInt(fromLastDays ?? '0');
-        const days = isNaN(parsedDays) ? 0 : parsedDays;
-        const parsedHours = parseInt(fromLastHour ?? '0');
-        const hours = isNaN(parsedHours) ? 0 : parsedHours;
-        const stats = await getTimeseriesData(ids, days, hours);
+        if (isNaN(Date.parse(startTime)) || (endTimeQuery && isNaN(Date.parse(endTimeQuery)))) {
+          Exception.notValid(res, ErrorCodes.INVALID_DATE_REQUEST);
+          return;
+        }
+        const endTime = query.endTime ? new Date(query.endTime as string) : new Date();
 
-        res.json({
-          batteryData: stats[0][0] ?? [],
-          inverterData: stats[1][0] ?? [],
-          panelData: stats[2][0] ?? [],
-        } satisfies OutputProtectedTimeseriesData);
+        const start = new Date(startTime);
+        const end = new Date(endTime);
+
+        const devices = await deviceEntity.findUsersDevices(account._id);
+        const ids = devices.map(device => device._id);
+
+        if (ids.length === 0) {
+          res.json([] satisfies ITimeseriesStatsOutput);
+        }
+
+        const processor = new TimeseriesProcessor(ids);
+        const stats = await processor.getTimeseriesStats({ startTime: start, endTime: end });
+        res.json(stats satisfies ITimeseriesStatsOutput);
       } catch (error) {
         Exception.parseError(res, error);
       }
@@ -76,16 +89,22 @@ export default () =>
      *        content:
      *         application/json:
      *          schema:
-     *            "$ref": "./components.yaml#/components/schemas/OutputProtectedTimeseriesData"
+     *            "$ref": "./components.yaml#/components/schemas/ITimeseriesStatsOutput"
      */
     read: async ({ params, account, query }, res) => {
       try {
         // workspace id
-        const { fromLastDays = '0', fromLastHour } = query;
-        if (typeof fromLastDays !== 'string' || (fromLastHour && typeof fromLastHour !== 'string')) {
+        const { startTime, endTime: endTimeQuery } = query;
+        if (typeof startTime !== 'string' || (endTimeQuery && typeof endTimeQuery !== 'string')) {
           Exception.notValid(res, ErrorCodes.INVALID_REQUEST);
           return;
         }
+        if (isNaN(Date.parse(startTime)) || (endTimeQuery && isNaN(Date.parse(endTimeQuery)))) {
+          Exception.notValid(res, ErrorCodes.INVALID_REQUEST);
+          return;
+        }
+        const endTime = query.endTime ? new Date(query.endTime as string) : new Date();
+
         const { id } = params;
 
         if (!isValidObjectId(id)) {
@@ -94,26 +113,20 @@ export default () =>
         }
         const workspaces = await workspaceEntity.findWorkspacesOfUser(account._id);
 
-        if (!workspaces.some((workspace) => workspace._id.equals(id))) {
+        if (!workspaces.some(workspace => workspace._id.equals(id))) {
           Exception.notValid(res, ErrorCodes.USER_NOT_AUTHORIZED);
           return;
         }
 
+        const start = new Date(startTime);
+        const end = new Date(endTime);
         const deviceIds = await deviceEntity.findOnlyIds(id);
-
-        const parsedDays = parseInt(fromLastDays ?? '0');
-        const days = isNaN(parsedDays) ? 0 : parsedDays;
-        const parsedHours = parseInt(fromLastHour ?? '0');
-        const hours = isNaN(parsedHours) ? 0 : parsedHours;
-        const stats = await getTimeseriesData(deviceIds, days, hours);
-
-        res.json({
-          batteryData: stats[0][0] ?? [],
-          inverterData: stats[1][0] ?? [],
-          panelData: stats[2][0] ?? [],
-        } satisfies OutputProtectedTimeseriesData);
+        const processor = new TimeseriesProcessor(deviceIds);
+        const stats = await processor.getTimeseriesStats({ startTime: start, endTime: end });
+        // let total = stats.reduce((sum, item) => sum + (item.charged ?? 0), 0);
+        res.json(stats satisfies ITimeseriesStatsOutput);
       } catch (error) {
         Exception.parseError(res, error);
-      } 
-    },
+      }
+    }
   });

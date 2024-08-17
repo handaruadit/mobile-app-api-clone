@@ -14,14 +14,14 @@ export interface InputProtectedDeviceUpdateBody {
   buildNumber?: string;
   location?: {
     ip: string;
-    country: string
+    country: string;
     city?: string;
     state?: string;
     coordinates?: {
       longitude?: number;
       latitude?: number;
-    }
-  }
+    };
+  };
   setting?: {
     geolocation?: boolean;
     notifications?: boolean;

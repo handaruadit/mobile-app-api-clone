@@ -19,8 +19,8 @@ class MQTT {
   }
 
   connect = (onConnected?: () => void, onDisconnected?: () => void) => {
-    console.log('Connecting to broker: ', process.env.HIVEMQ_URI_BATARI)
-    const conn = mqtt.connect(process.env.HIVEMQ_URI_BATARI ?? '', { 
+    console.log('Connecting to broker: ', process.env.HIVEMQ_URI_BATARI);
+    const conn = mqtt.connect(process.env.HIVEMQ_URI_BATARI ?? '', {
       username: process.env.HIVEMQ_USERNAME,
       password: process.env.HIVEMQ_PASSWORD,
       port: 8883,
@@ -48,37 +48,36 @@ class MQTT {
     conn.on('offline', () => {
       console.log('Client is offline');
     });
-    
+
     conn.on('reconnect', () => {
       console.log('Reconnecting to MQTT broker');
     });
-    
-    conn.on('end', () => { 
+
+    conn.on('end', () => {
       console.log('MQTT ended');
       this.connected = false;
       if (onDisconnected) {
         onDisconnected();
       }
     });
-    
-    conn.on('error', (e) => { 
+
+    conn.on('error', e => {
       console.error('Error occured', e);
     });
 
-
     this.client = conn;
-    this.addMainSubscriber()
+    this.addMainSubscriber();
   };
 
   addMainSubscriber = () => {
-    // this.client.subscribe('batari-energy/#');
+    this.client.subscribe('batari-energy/#');
     // this.client.subscribe('batari-energy/st-id/batteries/bat-id');
     this.messenger.processContents();
-  }
+  };
 
   closeConnection = async () => {
     if (this.client) this.client.end();
-  }
+  };
 
   // publishToQueues = (queuesArray: string[], payload: any) => {
   //   const data = JSON.stringify(payload);

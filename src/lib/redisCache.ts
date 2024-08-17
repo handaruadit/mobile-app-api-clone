@@ -17,7 +17,7 @@ export default class RedisCache {
       })
       .catch(console.error);
 
-    this.client.on('error', (err) => {
+    this.client.on('error', err => {
       this.connected = false;
       // console.warn(`[Redis] ${err}`);
     });
@@ -60,11 +60,7 @@ export default class RedisCache {
     }
   };
 
-  setCache = async (
-    id: string,
-    query: Record<string, string>,
-    data: Record<string, any>
-  ) => {
+  setCache = async (id: string, query: Record<string, string>, data: Record<string, any>) => {
     const key = this.formatKey(id, query);
     await this.set(key, JSON.stringify(data));
   };

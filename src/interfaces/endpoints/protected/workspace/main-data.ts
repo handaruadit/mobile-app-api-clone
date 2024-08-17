@@ -1,8 +1,8 @@
 // import { IProtectedInverterData } from "@/types";
 
-import { IBatteryDataModelOutput } from "@/models/batteryData";
-import { IInverterDataModelOutput } from "@/models/inverterData";
-import { IPanelDataModelOutput } from "@/models/panelData";
+import { IBatteryDataModelOutput } from '@/models/batteryData';
+import { IInverterDataModelOutput } from '@/models/inverterData';
+import { IPanelDataModelOutput } from '@/models/panelData';
 
 export interface OutputMainInverterData {
   _id?: null;
@@ -20,6 +20,8 @@ export interface OutputMainInverterData {
   avgAcVoltageOut?: number;
   avgAcCurrenctIn?: number;
   avgAcCurrentOut?: number;
+  consumption?: number;
+  energyFromGrid?: number;
 }
 
 export interface OutputMainBatteryData {
@@ -53,9 +55,7 @@ export interface OutputMainPanelData {
   avgTemperature?: number;
 }
 
-export type StatsOutput = OutputMainBatteryData &
-  OutputMainInverterData &
-  OutputMainPanelData;
+export type StatsOutput = OutputMainBatteryData & OutputMainInverterData & OutputMainPanelData;
 
 export type OutputProtectedData = {
   panelData: OutputMainPanelData;
@@ -74,7 +74,7 @@ export type SolarPanelDataOutput = {
 
 // export type OutputProtectedTimeseriesData = IProtectedInverterData[];
 export type OutputProtectedTimeseriesData = {
-  panelData: IPanelDataModelOutput;
-  batteryData: IBatteryDataModelOutput;
-  inverterData: IInverterDataModelOutput;
+  panelData: IPanelDataModelOutput[];
+  batteryData: IBatteryDataModelOutput[];
+  inverterData: IInverterDataModelOutput[];
 };

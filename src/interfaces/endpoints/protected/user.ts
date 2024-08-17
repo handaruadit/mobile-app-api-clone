@@ -19,7 +19,7 @@ export interface InputProtectedUserPutBody {
     darkMode?: DeviceDarkModeSettings;
     time24?: boolean;
     language?: string;
-  }
+  };
 }
 export interface OutputProtectedUserPut {
   user: IBaseUserEntity;

@@ -27,5 +27,5 @@ export default () =>
       } catch (error) {
         Exception.serverError(res);
       }
-    },
+    }
   });

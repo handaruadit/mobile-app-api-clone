@@ -17,11 +17,11 @@ const schema = new Schema(
       required: true,
       ref: 'Workspace'
     },
-    deviceId:  {
+    deviceId: {
       type: Schema.Types.ObjectId,
       required: true,
       // required: [true, ValidationErrorCodes.WORKSPACE_IS_REQUIRED],
-      ref: 'Device',
+      ref: 'Device'
     },
     inverterId: {
       type: String
@@ -30,16 +30,16 @@ const schema = new Schema(
 
     // PV panel
     voltage: {
-      type: Number, // unit: volts
+      type: Number // unit: volts
     },
-    current:  {
-      type: Number, // unit: amperes
+    current: {
+      type: Number // unit: amperes
     },
-    power:  {
-      type: Number, // unit: watts
+    power: {
+      type: Number // unit: watts
     },
     lux: {
-      type: Number, // lux
+      type: Number // lux
     },
     temperature: {
       type: Number // Celcius
@@ -51,14 +51,14 @@ const schema = new Schema(
       type: Date,
       required: true,
       default: new Date()
-    },
+    }
   },
   {
     timestamps: true,
     timeseries: {
       timeField: 'sentAt',
       metaField: 'metadata',
-      granularity: 'seconds',
+      granularity: 'seconds'
     }
   }
 );
@@ -68,10 +68,7 @@ export type IPanelDataModelWithId = IPanelDataModel & {
   _id: Types.ObjectId;
 };
 export type IPanelDataModelOutput = StringIds<IPanelDataModelWithId>;
-export type IPanelDataModelPayload = Omit<
-  IPanelDataModel,
-  'createdAt' | 'updatedAt'
->;
+export type IPanelDataModelPayload = Omit<IPanelDataModel, 'createdAt' | 'updatedAt'>;
 
 class MongooseModel extends Abstract {
   declare model: Model<IPanelDataModel>;
@@ -87,27 +84,27 @@ class MongooseModel extends Abstract {
   };
 
   /**
-   * 
-   * @param deviceIds 
+   *
+   * @param deviceIds
    * @param days days 0 means it's only today
-   * @param timezone 
-   * @returns 
+   * @param timezone
+   * @returns
    */
   getMainStats = async (
     deviceIds: string[] | Types.ObjectId[],
     uuids: string[] | Types.ObjectId[],
     days: number,
-    timezone: string = 'Asia/Jakarta'
+    timezone = 'Asia/Jakarta'
   ): Promise<OutputMainPanelData> => {
     const todayStart = moment().tz(timezone).subtract(days, 'days').startOf('day');
     const matchPipeline: any = {
       sentAt: { $gte: todayStart.toDate() },
       deviceId: { $in: deviceIds }
-    }
+    };
     if (uuids.length) {
       matchPipeline.uuid = { $in: uuids };
-    };
-  
+    }
+
     const pipeline = [
       {
         $match: matchPipeline
@@ -115,22 +112,22 @@ class MongooseModel extends Abstract {
       {
         $group: {
           _id: null,
-          totalYield: { $sum: { $add: ["$panelPower", "$batteryPower"] } },
-          totalConsumption: { $sum: { $add: ["$panelPower", "$batteryPower" ] } },
-          totalCharging: { $sum: "$batteryPower" },
-          totalPowerUsage: { $sum: "$panelPower" }
+          totalYield: { $sum: { $add: ['$panelPower', '$batteryPower'] } },
+          totalConsumption: { $sum: { $add: ['$panelPower', '$batteryPower'] } },
+          totalCharging: { $sum: '$batteryPower' },
+          totalPowerUsage: { $sum: '$panelPower' }
         }
       }
     ];
 
     const result = await this.model.aggregate(pipeline);
     return result ? result[0] : {};
-  }
+  };
 
   // TODO
-  getTimeseriesData = async (deviceIds: string[] | Types.ObjectId[], hours?: number, timezone: string = 'UTC') => {
+  getTimeseriesData = async (deviceIds: string[] | Types.ObjectId[], hours?: number, timezone = 'UTC') => {
     const filterDate = moment().tz(timezone).subtract(hours, 'hours').toDate();
-    
+
     return await this.find<IPanelDataModelWithId>(
       {
         sentAt: { $gte: filterDate },
@@ -143,7 +140,7 @@ class MongooseModel extends Abstract {
       undefined,
       'deviceId sentAt current power voltage power lux createdAt'
     );
-  }
+  };
 
   // populate = (query: Query<any, any>) =>
   //   query

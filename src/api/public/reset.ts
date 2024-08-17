@@ -2,10 +2,7 @@ import { tokenPassword as tokenEntity, user } from '@/models';
 import { ITokenModelWithId } from '@/models/tokenPassword';
 import { IUserModelWithId } from '@/models/user';
 
-import {
-  OutputPublicResetGet,
-  OutputPublicResetPost
-} from '@/interfaces/endpoints/public/reset';
+import { OutputPublicResetGet, OutputPublicResetPost } from '@/interfaces/endpoints/public/reset';
 import { encryptPassword } from '@/lib/encode';
 import { ErrorCodes, ReturnCodes } from '@/lib/enum';
 import Exception from '@/lib/exception';

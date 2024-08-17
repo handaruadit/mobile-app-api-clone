@@ -1,8 +1,6 @@
 import { Request } from 'express';
 
-import {
-  device as entity
-} from '@/models';
+import { device as entity } from '@/models';
 import { IDeviceModelWithId } from '@/models/device';
 
 import { ErrorCodes, ReturnCodes, Roles } from '@/lib/enum';
@@ -42,7 +40,7 @@ export default () =>
           plantedAt: body.plantedAt ?? new Date(),
           company: body.company,
           workspace: body.workspace
-        }
+        };
 
         await entity.update<IDeviceModelWithId>(params.id, payload);
 
@@ -50,5 +48,5 @@ export default () =>
       } catch (error) {
         Exception.parseError(res, error);
       }
-    },
+    }
   });

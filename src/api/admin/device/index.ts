@@ -1,9 +1,6 @@
 import { Request } from 'express';
 
-import {
-  device as entity,
-  workspace as workspaceEntity,
-} from '@/models';
+import { device as entity, workspace as workspaceEntity } from '@/models';
 import { IUserModelWithId } from '@/models/user';
 import { IDeviceModelWithId } from '@/models/device';
 
@@ -19,14 +16,14 @@ export default () =>
     post: async ({ body }: Request & { body: IAdminPostDeviceBody }, res) => {
       try {
         const { name, workspace } = body as IAdminPostDeviceBody;
-        
+
         if (!name || !workspace) {
           Exception.notValid(res);
           return;
         }
-  
+
         const existingWorkspace = await workspaceEntity.get<IUserModelWithId>(workspace);
-  
+
         if (!existingWorkspace) {
           Exception.notFound(res, ErrorCodes.WORKSPACE_NOT_FOUND);
           return;
@@ -52,14 +49,8 @@ export default () =>
         if (!query) {
           return Exception.notValid(res);
         }
-        const [total, workspaces] = await entity.paginatedFind<IDeviceModelWithId>(
-          {},
-          'createdAt',
-          'descending',
-          limit,
-          true
-        );
-        
+        const [total, workspaces] = await entity.paginatedFind<IDeviceModelWithId>({}, 'createdAt', 'descending', limit, true);
+
         res.json({
           data: workspaces,
           offset: Number(offset),
@@ -111,7 +102,7 @@ export default () =>
           warrantyExpiration: body.warrantyExpiration,
           inverterType: body.inverterType,
           weatherResistanceRating: body.weatherResistanceRating
-        }
+        };
 
         const updated = await entity.update<IDeviceModelWithId>(params.id, payload);
 

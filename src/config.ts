@@ -16,9 +16,7 @@ const config: IConfig = {
     corsHeaders: ['Link']
   },
   app: {
-    queryLimit: process.env.QUERY_LIMIT
-      ? parseInt(process.env.QUERY_LIMIT, 10)
-      : 100
+    queryLimit: process.env.QUERY_LIMIT ? parseInt(process.env.QUERY_LIMIT, 10) : 100
   }
 };
 

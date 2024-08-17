@@ -1,4 +1,4 @@
-import { IOutputDevice } from "@/types";
+import { IOutputDevice } from '@/types';
 
 export interface IAdminPostDeviceBody {
   name: string;

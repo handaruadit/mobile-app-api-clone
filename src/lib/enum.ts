@@ -61,6 +61,7 @@ export enum ErrorCodes {
   INVITATION_NOT_FOUND = 'InvitationNotFound',
   INVALID_REQUEST = 'InvalidRequest',
   INVALID_ID = 'InvalidId',
+  INVALID_DATE_REQUEST = 'InvalidDateRequest',
   EMAIL_ALREADY_EXISTS = 'EmailAlreadyExists',
   LINK_NOT_VALID = 'LinkNotValid',
   LINK_NOT_FOUND = 'LinkNotFound',
@@ -126,4 +127,26 @@ export enum DeviceDarkModeSettings {
   LIGHT = 'light',
   DARK = 'dark',
   AUTO = 'auto'
+}
+
+export enum PLNPrice {
+  R1_TR_900VA = 1352,
+  R1_TR_1300VA = 1444.7,
+  R1_TR_2200VA = 1444.7,
+  R2_TR_3500_5500VA = 1699.53,
+  R3_TR_6600VA_ABOVE = 1699.53,
+  B2_TR_6600VA_200KVA = 1444.7,
+  B3_TM_ABOVE_200KVA = 1114.74,
+  I3_TM_ABOVE_200KVA = 1114.74,
+  I4_TT_30000KVA_ABOVE = 996.74,
+  P1_TR_6600VA_200KVA = 1699.53,
+  P2_TM_ABOVE_200KVA = 1522.88,
+  P3_TR_PUBLIC_LIGHTING = 1699.53,
+  L_TR_TM_TT = 1644.52
+}
+
+export enum DeviceComponentType {
+  BATTERY = 'battery',
+  PANEL = 'panel',
+  INVERTER = 'inverter'
 }

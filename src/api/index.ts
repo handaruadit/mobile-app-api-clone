@@ -20,23 +20,13 @@ export interface IRouteParams {
   db: mongoose.Connection;
 }
 
-const requireFile = (
-  prefix: string,
-  paths: { [path: string]: any },
-  api: Router,
-  params: IRouteParams
-) => {
-  const sortedPaths = Object.fromEntries(
-    Object.entries(paths).sort(([v1]) => (v1 === 'index' ? 1 : -1))
-  );
+const requireFile = (prefix: string, paths: { [path: string]: any }, api: Router, params: IRouteParams) => {
+  const sortedPaths = Object.fromEntries(Object.entries(paths).sort(([v1]) => (v1 === 'index' ? 1 : -1)));
 
   Object.entries(sortedPaths).forEach(([key, file]) => {
     if (file.default) {
       if (key?.includes('.ts') || key?.includes('.js')) {
-        const endpoint = `/${prefix}/${key
-          .replace('.js', '')
-          .replace('.ts', '')
-          .replace('index', '')}`;
+        const endpoint = `/${prefix}/${key.replace('.js', '').replace('.ts', '').replace('index', '')}`;
         console.log(endpoint);
         // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-call
         api.use(endpoint, file.default(params));
@@ -72,7 +62,7 @@ export default ({ config, client, db }: IRouteParams) => {
     requireFile('admin', adminPaths, api, params);
   }
 
-  process.env.AVAILABLE_PATHS?.split(',').forEach((path) => {
+  process.env.AVAILABLE_PATHS?.split(',').forEach(path => {
     api.get(`/${path}/`, (req, res) => {
       res.json({ version });
     });

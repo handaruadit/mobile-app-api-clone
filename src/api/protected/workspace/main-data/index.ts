@@ -1,9 +1,6 @@
 import { isValidObjectId } from 'mongoose';
 
-import {
-  device as deviceEntity,
-  workspace as workspaceEntity
-} from '@/models';
+import { device as deviceEntity, workspace as workspaceEntity } from '@/models';
 
 import { ErrorCodes } from '@/lib/enum';
 import Exception from '@/lib/exception';
@@ -47,18 +44,18 @@ export default () =>
           return;
         }
 
-        const devices = workspaces ? 
-          await deviceEntity.find<IDeviceModelWithId>({
-            workspace: { $in: Array.isArray(workspaces) ? workspaces : [workspaces] }
-          })
+        const devices = workspaces
+          ? await deviceEntity.find<IDeviceModelWithId>({
+              workspace: { $in: Array.isArray(workspaces) ? workspaces : [workspaces] }
+            })
           : await deviceEntity.findUsersDevices(account._id);
 
-        const ids = devices.map((device) => device._id);
-    
+        const ids = devices.map(device => device._id);
+
         const parsedDays = parseInt(fromLastDays) ?? 0;
-        const days = isNaN(parsedDays) ? 0 : parsedDays;
-        const parsedHours = fromLastHours ? parseInt(fromLastHours as string) : undefined
-        const stats = await getMainStats(ids, days, parsedHours);
+        const daysAgoStart = isNaN(parsedDays) ? 0 : parsedDays;
+        const hoursAgoStart = fromLastHours ? parseInt(fromLastHours as string) : undefined;
+        const stats = await getMainStats({ deviceIds: ids, daysAgoStart, hoursAgoStart });
 
         res.json({
           batteryData: stats[0][0] ?? {},
@@ -96,26 +93,26 @@ export default () =>
           return;
         }
         const workspaces = await workspaceEntity.findWorkspacesOfUser(account._id);
-        if (!workspaces.some((workspace) => workspace._id.equals(id))) {
+        if (!workspaces.some(workspace => workspace._id.equals(id))) {
           Exception.notValid(res, ErrorCodes.USER_NOT_AUTHORIZED);
           return;
         }
 
         const deviceIds = await deviceEntity.findOnlyIds(id);
-        
-        const parsedDays = parseInt(fromLastDays as string ?? '0');
-        const days = isNaN(parsedDays) ? 0 : parsedDays;
-        const parsedHours = fromLastHours ? parseInt(fromLastHours as string) : undefined
-        const stats = await getMainStats(deviceIds, days, parsedHours);
+
+        const parsedDays = parseInt((fromLastDays as string) ?? '0');
+        const daysAgoStart = isNaN(parsedDays) ? 0 : parsedDays;
+        const hoursAgoStart = fromLastHours ? parseInt(fromLastHours as string) : undefined;
+        const stats = await getMainStats({ deviceIds, daysAgoStart, hoursAgoStart });
 
         res.json({
-         batteryData: stats[0][0] ?? {},
-         inverterData: stats[1][0] ?? {},
-         panelData: stats[2][0] ?? {},
-         calculatedData: stats[3]
-       } satisfies OutputProtectedData);
+          batteryData: stats[0][0] ?? {},
+          inverterData: stats[1][0] ?? {},
+          panelData: stats[2][0] ?? {},
+          calculatedData: stats[3]
+        } satisfies OutputProtectedData);
       } catch (error) {
         Exception.parseError(res, error);
-      } 
-    },
+      }
+    }
   });

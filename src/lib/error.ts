@@ -4,5 +4,3 @@ export class BusinessRuleValidationError extends Error {
     this.name = 'BusinessRuleValidationError';
   }
 }
-
-

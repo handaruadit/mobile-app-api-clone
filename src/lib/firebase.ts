@@ -1,6 +1,6 @@
 import admin, { ServiceAccount } from 'firebase-admin';
 // TODO: changet to admin.credential.cert
-import serviceAccount from "../../creds/batari-eee6e-firebase-adminsdk-pkoab-0d19970fbf.json";
+import serviceAccount from '../../creds/batari-eee6e-firebase-adminsdk-pkoab-0d19970fbf.json';
 export default class FirebaseApp {
   private static instance: FirebaseApp;
   messaging: admin.messaging.Messaging;
@@ -11,7 +11,7 @@ export default class FirebaseApp {
     //   clientEmail: process.env.SERVICE_ACC_KEY_CLIENT_EMAIL,
     //   privateKey: process.env.SERVICE_ACC_KEY_PRIVATE_KEY
     // });
-  
+
     const app = admin.initializeApp({
       credential: admin.credential.cert(serviceAccount as ServiceAccount)
     });
@@ -30,16 +30,17 @@ export default class FirebaseApp {
     const message = {
       notification: {
         title: 'Test Notification',
-        body: 'This is a test notification from Firebase Admin.',
+        body: 'This is a test notification from Firebase Admin.'
       },
-      topic: 'test_topic',
+      topic: 'test_topic'
     };
-    
-    this.messaging.send(message)
+
+    this.messaging
+      .send(message)
       .then(() => {
         console.log('LOG: Test notification sent successfully.');
       })
-      .catch((error) => {
+      .catch(error => {
         throw new Error(`Error sending test notification: ${error}`);
       });
   }

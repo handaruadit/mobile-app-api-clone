@@ -12,4 +12,4 @@ export const DEFAULT_DEVICE_SPEC = {
   material: process.env.MATERIAL,
   inverterType: process.env.INVERTERTYPE,
   weatherResistanceRating: process.env.WEATHERRESISTANCERATING
-}
+};

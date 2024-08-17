@@ -1,11 +1,6 @@
 import { isValidObjectId } from 'mongoose';
 
-import {
-  workspace as entity,
-  company as entityCompany,
-  user as entityUser,
-  tokenInvitation as tokenInvit
-} from '@/models';
+import { workspace as entity, company as entityCompany, user as entityUser, tokenInvitation as tokenInvit } from '@/models';
 import { ICompanyModelWithId } from '@/models/company';
 import { ITokenInvitationModelWithId } from '@/models/tokenInvitation';
 import { IUserModelWithId } from '@/models/user';
@@ -24,16 +19,16 @@ import resource from '@/middleware/resource-router-middleware';
 
 export default () =>
   resource({
-  //   permissions: {
-  //     put: {
-  //       entity: Entities.WORKSPACE,
-  //       permissions: [Roles.ADMIN, Roles.WRITE]
-  //     },
-  //     delete: {
-  //       entity: Entities.WORKSPACE,
-  //       permissions: [Roles.ADMIN]
-  //     }
-  //   },
+    //   permissions: {
+    //     put: {
+    //       entity: Entities.WORKSPACE,
+    //       permissions: [Roles.ADMIN, Roles.WRITE]
+    //     },
+    //     delete: {
+    //       entity: Entities.WORKSPACE,
+    //       permissions: [Roles.ADMIN]
+    //     }
+    //   },
 
     /**
      * @openapi
@@ -103,9 +98,7 @@ export default () =>
           token: randomToken()
         };
 
-        existToken = await tokenInvit.create<ITokenInvitationModelWithId>(
-          payload
-        );
+        existToken = await tokenInvit.create<ITokenInvitationModelWithId>(payload);
 
         await sendInvitationSignUpEmail(
           email,
@@ -119,9 +112,7 @@ export default () =>
       }
 
       // User already exist
-      const userAlreadyExistInWorkspace = workspaceCurrent.members.some(
-        (member) => member.id?.equals(user._id)
-      );
+      const userAlreadyExistInWorkspace = workspaceCurrent.members.some(member => member.id?.equals(user._id));
 
       if (userAlreadyExistInWorkspace) {
         Exception.conflict(res, ErrorCodes.USER_ALREADY_IN_WORKSPACE);
@@ -213,10 +204,7 @@ export default () =>
           return;
         }
 
-        await entity.findOneAndUpdate(
-          { _id: item._id, 'members.id': id },
-          { $set: { 'members.$.permissions': permissions } }
-        );
+        await entity.findOneAndUpdate({ _id: item._id, 'members.id': id }, { $set: { 'members.$.permissions': permissions } });
 
         res.json({
           code: ReturnCodes.PERMISSIONS_UPDATED
@@ -258,10 +246,7 @@ export default () =>
           return;
         }
 
-        await entity.findOneAndUpdate(
-          { _id: item._id },
-          { $pull: { members: { id } } }
-        );
+        await entity.findOneAndUpdate({ _id: item._id }, { $pull: { members: { id } } });
 
         res.json({
           code: ReturnCodes.USER_REMOVED

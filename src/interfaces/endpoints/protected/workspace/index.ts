@@ -1,8 +1,4 @@
-import {
-  IOutputWorkspacePopulated,
-  IOutputWorkspaceList,
-  IOutputWorkspace
-} from '@/interfaces/entities';
+import { IOutputWorkspacePopulated, IOutputWorkspaceList, IOutputWorkspace } from '@/interfaces/entities';
 import { ReturnCodes } from '@/lib/enum';
 import { IOutputWorkspacePermission } from '@/types';
 

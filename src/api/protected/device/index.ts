@@ -1,9 +1,6 @@
 import { Request } from 'express';
 
-import {
-  device as entity,
-  workspace as workspaceEntity
-} from '@/models';
+import { device as entity, workspace as workspaceEntity } from '@/models';
 import { IDeviceModelWithId } from '@/models/device';
 import { IWorkspaceModelWithId } from '@/models/workspace';
 
@@ -11,7 +8,7 @@ import { ErrorCodes, ReturnCodes, Roles } from '@/lib/enum';
 import Exception from '@/lib/exception';
 import resource from '@/middleware/resource-router-middleware';
 import { isInvalidPaginateParams } from '@/lib/util';
-import { IAdminDeleteOutput, IProtectedListDeviceOutput,  IProtectedPostDeviceBody } from '@/types';
+import { IAdminDeleteOutput, IProtectedListDeviceOutput, IProtectedPostDeviceBody } from '@/types';
 
 export default () =>
   resource({
@@ -31,14 +28,14 @@ export default () =>
     // post: async ({ account, body }: Request & { body: IProtectedPostDeviceBody }, res) => {
     //   try {
     //     const { name, workspace } = body as IProtectedPostDeviceBody;
-        
+
     //     if (!name || !workspace) {
     //       Exception.notValid(res);
     //       return;
     //     }
-  
+
     //     const existingWorkspace = await workspaceEntity.get<IWorkspaceModelWithId>(workspace);
-        
+
     //     if (!existingWorkspace) {
     //       Exception.notFound(res, ErrorCodes.WORKSPACE_NOT_FOUND);
     //       return;
@@ -78,14 +75,8 @@ export default () =>
         if (!query) {
           return Exception.notValid(res);
         }
-        const [total, workspaces] = await entity.paginatedFind<IDeviceModelWithId>(
-          {},
-          'createdAt',
-          'descending',
-          limit,
-          true
-        );
-        
+        const [total, workspaces] = await entity.paginatedFind<IDeviceModelWithId>({}, 'createdAt', 'descending', limit, true);
+
         res.json({
           data: workspaces,
           offset: Number(offset),
@@ -106,7 +97,7 @@ export default () =>
           Exception.unauthorized(res, error);
           return;
         }
-  
+
         if (!params?.id) {
           return Exception.notValid(res);
         }
@@ -147,7 +138,7 @@ export default () =>
           plantedAt: body.plantedAt,
           company: body.company,
           workspace: body.workspace
-        }
+        };
 
         const updated = await entity.update<IDeviceModelWithId>(params.id, payload);
 
@@ -166,7 +157,7 @@ export default () =>
         const [existingWorkspace] = await workspaceEntity.find<IWorkspaceModelWithId>({
           ownerId: account._id
         });
-        
+
         if (!existingWorkspace) {
           Exception.notFound(res, ErrorCodes.WORKSPACE_NOT_FOUND);
           return;

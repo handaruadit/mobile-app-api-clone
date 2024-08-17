@@ -1,8 +1,6 @@
 import { Request } from 'express';
 
-import {
-  notification as entity
-} from '@/models';
+import { notification as entity } from '@/models';
 import { INotificationModelWithId } from '@/models/notification';
 
 import { ErrorCodes } from '@/lib/enum';
@@ -48,15 +46,9 @@ export default () =>
         if (level && ['info', 'warning', 'danger'].includes(level as string)) {
           filtering.level = level;
         }
-        
-        const [total, notifications] = await entity.paginatedFind<INotificationModelWithId>(
-          filtering,
-          'createdAt',
-          'descending',
-          limit,
-          true
-        );
-        
+
+        const [total, notifications] = await entity.paginatedFind<INotificationModelWithId>(filtering, 'createdAt', 'descending', limit, true);
+
         res.json({
           data: notifications,
           offset: Number(offset),
@@ -77,7 +69,7 @@ export default () =>
     //       Exception.unauthorized(res, error);
     //       return;
     //     }
-  
+
     //     if (!params?.id) {
     //       return Exception.notValid(res);
     //     }
@@ -104,16 +96,19 @@ export default () =>
           return;
         }
 
-        const updated = await entity.updateWhere({
-          _id: { _in: notificationIds },
-          userId: account._id
-        }, { read: true });
+        const updated = await entity.updateWhere(
+          {
+            _id: { _in: notificationIds },
+            userId: account._id
+          },
+          { read: true }
+        );
 
         res.json(updated satisfies INotificationModelWithId);
       } catch (error) {
         Exception.parseError(res, error);
       }
-    },
+    }
 
     // only unpair owner
     // delete: async ({ account, params }: Request, res) => {
@@ -124,7 +119,7 @@ export default () =>
     //     const [existingWorkspace] = await workspaceEntity.find<IWorkspaceModelWithId>({
     //       ownerId: account._id
     //     });
-        
+
     //     if (!existingWorkspace) {
     //       Exception.notFound(res, ErrorCodes.WORKSPACE_NOT_FOUND);
     //       return;

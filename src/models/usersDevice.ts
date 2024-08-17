@@ -1,4 +1,3 @@
-
 /**
  * mobileDevice is user's device.
  * a user can have multiple device.
@@ -79,10 +78,7 @@ export type IUsersDeviceModelWithId = IUsersDeviceModel & {
   _user: IUserMinimalModel;
 };
 export type IUsersDeviceModelOutput = StringIds<IUsersDeviceModelWithId>;
-export type IUsersDeviceModelPayload = Omit<
-  IUsersDeviceModel,
-  'createdAt' | 'updatedAt'
->;
+export type IUsersDeviceModelPayload = Omit<IUsersDeviceModel, 'createdAt' | 'updatedAt'>;
 
 class MongooseModel extends Abstract {
   declare model: Model<IUsersDeviceModel>;
@@ -104,9 +100,7 @@ class MongooseModel extends Abstract {
     this.model = model('UsersDevice', schema);
   };
 
-  populate = (query: Query<any, any>) =>
-    query
-      .populate('_user', '_id name email')
+  populate = (query: Query<any, any>) => query.populate('_user', '_id name email');
 }
 
 const inst = new MongooseModel();

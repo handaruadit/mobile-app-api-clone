@@ -1,18 +1,11 @@
 import isLength from 'validator/lib/isLength';
 
-import {
-  tokenInvitation as entity,
-  user as entityUser,
-  workspace as entityWorkspace
-} from '@/models';
+import { tokenInvitation as entity, user as entityUser, workspace as entityWorkspace } from '@/models';
 import { ITokenInvitationModelWithId as IEntityModel } from '@/models/tokenInvitation';
 import { IUserModelWithId } from '@/models/user';
 import { IWorkspaceModelWithId } from '@/models/workspace';
 
-import {
-  OutputPublicInvitationGet,
-  OutputPublicInvitationPost
-} from '@/interfaces/endpoints/public/invitation';
+import { OutputPublicInvitationGet, OutputPublicInvitationPost } from '@/interfaces/endpoints/public/invitation';
 import { encryptPassword } from '@/lib/encode';
 import { ErrorCodes } from '@/lib/enum';
 import Exception from '@/lib/exception';
@@ -81,8 +74,7 @@ export default () =>
         return;
       }
 
-      const valid =
-        isLength(password, { min: 6 }) && isLength(name, { min: 2 });
+      const valid = isLength(password, { min: 6 }) && isLength(name, { min: 2 });
 
       if (!valid) {
         Exception.notValid(res);
@@ -99,10 +91,9 @@ export default () =>
         return;
       }
 
-      const [workspaceExists] =
-        await entityWorkspace.find<IWorkspaceModelWithId>({
-          _id: workspaceId
-        });
+      const [workspaceExists] = await entityWorkspace.find<IWorkspaceModelWithId>({
+        _id: workspaceId
+      });
       if (!workspaceExists) {
         Exception.notFound(res, ErrorCodes.WORKSPACE_NOT_FOUND);
         return;

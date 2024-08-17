@@ -3,14 +3,8 @@ import { isValidObjectId } from 'mongoose';
 
 import { company as entity, workspace as workspaceEntity } from '@/models';
 import { runTransaction } from '@/models/abstract';
-import {
-  ICompanyModelWithId as IEntityModel,
-  ICompanyModelPayload as IEntityPayload
-} from '@/models/company';
-import {
-  IWorkspaceModelWithId as IEntityModelWorkspace,
-  IWorkspaceModelPayload
-} from '@/models/workspace';
+import { ICompanyModelWithId as IEntityModel, ICompanyModelPayload as IEntityPayload } from '@/models/company';
+import { IWorkspaceModelWithId as IEntityModelWorkspace, IWorkspaceModelPayload } from '@/models/workspace';
 
 import {
   OutputProtectedCompanyDelete,
@@ -22,14 +16,7 @@ import { ErrorCodes, ReturnCodes } from '@/lib/enum';
 import Exception from '@/lib/exception';
 import resource from '@/middleware/resource-router-middleware';
 
-export async function sendPaymentAccountCreation(
-  urlApi: string,
-  {
-    name,
-    companyId,
-    country
-  }: { name?: string; companyId: string; country?: string }
-) {
+export async function sendPaymentAccountCreation(urlApi: string, { name, companyId, country }: { name?: string; companyId: string; country?: string }) {
   const accountResponse = await axios.post(
     urlApi,
     { name, companyId, country },
@@ -214,9 +201,7 @@ export default () =>
         companyId: id
       });
 
-      const hasOnlyOwnerAsMember = workspaces.every((workspace) =>
-        workspace.ownerId?.equals(account._id)
-      );
+      const hasOnlyOwnerAsMember = workspaces.every(workspace => workspace.ownerId?.equals(account._id));
 
       if (!hasOnlyOwnerAsMember) {
         Exception.forbidden(res, ErrorCodes.USER_NOT_AUTHORIZED);

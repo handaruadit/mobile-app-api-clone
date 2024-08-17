@@ -16,7 +16,7 @@ export default () =>
     post: async ({ body }: Request & { body: IAdminPostWorkspaceBody }, res) => {
       try {
         const { name, ownerId, coordinates } = body as IAdminPostWorkspaceBody;
-        
+
         if (!name || !ownerId) {
           Exception.notValid(res);
           return;
@@ -29,9 +29,9 @@ export default () =>
             return;
           }
         }
-  
+
         const existingUser = await userEntity.get<IUserModelWithId>(ownerId);
-  
+
         if (!existingUser) {
           Exception.notFound(res, ErrorCodes.USER_NOT_FOUND);
           return;
@@ -57,14 +57,8 @@ export default () =>
         if (!query) {
           return Exception.notValid(res);
         }
-        const [total, workspaces] = await entity.paginatedFind<IWorkspaceModelWithId>(
-          {},
-          'createdAt',
-          'descending',
-          limit,
-          true
-        );
-        
+        const [total, workspaces] = await entity.paginatedFind<IWorkspaceModelWithId>({}, 'createdAt', 'descending', limit, true);
+
         res.json({
           data: workspaces,
           offset: Number(offset),
@@ -99,7 +93,7 @@ export default () =>
     put: async ({ body, params }: Request & { body: any }, res) => {
       try {
         const { ownerId, coordinates } = body as IAdminPostWorkspaceBody;
-        
+
         if (coordinates) {
           const valid = isValidLatLong(coordinates.latitude || 0, coordinates.longitude || 0);
           if (!valid) {
@@ -107,10 +101,10 @@ export default () =>
             return;
           }
         }
-        
+
         if (ownerId) {
           const existingUser = await userEntity.get<IUserModelWithId>(ownerId);
-    
+
           if (!existingUser) {
             Exception.notFound(res, ErrorCodes.USER_NOT_FOUND);
             return;
