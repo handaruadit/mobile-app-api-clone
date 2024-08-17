@@ -48,6 +48,50 @@ export async function performHourlyAggregation() {
   }
 }
 
+export async function performDailyAggregation() {
+  try {
+    const devices = await entity.model.find().populate('inverters').populate('panels').populate('batteries');
+
+    const batteryIds = devices.map(device => device.batteries.map((battery: any) => battery._id));
+    const batteryEntity = new BatteryStats(batteryIds.flat());
+
+    const panelIds = devices.map(device => device.panels.map((panel: any) => panel._id));
+    const panelEntity = new PanelStats(panelIds.flat());
+
+    const inverterIds = devices.map(device => device.inverters.map((inverter: any) => inverter._id));
+    const inverterEntity = new InverterStats(inverterIds.flat());
+
+    await Promise.all([inverterEntity.aggregateDailyData(), panelEntity.aggregateDailyData(), batteryEntity.aggregateDailyData()]);
+
+    return;
+  } catch (error) {
+    console.error('Error during database query:', error);
+    throw error;
+  }
+}
+
+export async function performWeeklyAggregation() {
+  try {
+    const devices = await entity.model.find().populate('inverters').populate('panels').populate('batteries');
+
+    const batteryIds = devices.map(device => device.batteries.map((battery: any) => battery._id));
+    const batteryEntity = new BatteryStats(batteryIds.flat());
+
+    const panelIds = devices.map(device => device.panels.map((panel: any) => panel._id));
+    const panelEntity = new PanelStats(panelIds.flat());
+
+    const inverterIds = devices.map(device => device.inverters.map((inverter: any) => inverter._id));
+    const inverterEntity = new InverterStats(inverterIds.flat());
+
+    await Promise.all([inverterEntity.aggregateWeeklyData(), panelEntity.aggregateWeeklyData(), batteryEntity.aggregateWeeklyData()]);
+
+    return;
+  } catch (error) {
+    console.error('Error during database query:', error);
+    throw error;
+  }
+}
+
 export function startCronJobs() {
   cron.schedule('* * * * *', async () => {
     console.log('Running minute aggregation...');
@@ -65,6 +109,25 @@ export function startCronJobs() {
       console.log('Hour aggregation completed successfully.');
     } catch (error) {
       console.error('Error during hour aggregation:', error);
+    }
+  });
+  cron.schedule('0 0 * * *', async () => {
+    console.log('Running daily aggregation...');
+    try {
+      await performDailyAggregation();
+      console.log('Daily aggregation completed successfully.');
+    } catch (error) {
+      console.error('Error during daily aggregation:', error);
+    }
+  });
+
+  cron.schedule('0 0 * * 0', async () => {
+    console.log('Running weekly aggregation...');
+    try {
+      await performWeeklyAggregation();
+      console.log('Weekly aggregation completed successfully.');
+    } catch (error) {
+      console.error('Error during weekly aggregation:', error);
     }
   });
 }

@@ -1,8 +1,9 @@
 //@ts-nocheck
 import { BusinessRuleValidationError } from '@/lib/error';
-import { ISitesData, ITimeseriesStatsOutput, StatsOutput } from '@/types';
+import { ISitesData, ITimeseriesAggregate, ITimeseriesStatsOutput, StatsOutput } from '@/types';
 import * as dfd from 'danfojs-node';
 import { BaseDataOptionType } from 'danfojs-node/dist/danfojs-base/shared/types';
+import { Model } from 'mongoose';
 
 export interface IMainStatsOptions {
   timezone?: string;
