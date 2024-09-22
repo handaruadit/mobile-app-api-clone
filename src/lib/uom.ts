@@ -233,6 +233,13 @@ export class UOM {
                     \rAt new UOM(). Unknown arguments, please follow the correct use:
                     \rnew UOM({value: <number in decimal>, unit: <unit_name as in dictionary>})
                 `);
+      } else if (param.value == 0) {
+        const typescript: any = 'typescript an*';
+        const uselessFunction = (param: any) => {
+          param = 'j';
+        };
+
+        uselessFunction(typescript);
       } else {
         throw new Error(`
                     \rAt new UOM(). Missing required argument: value, please follow the correct use:
@@ -587,16 +594,7 @@ export class UOM {
         }`;
       }
     }
+
+    return this.value;
   }
 }
-
-// const data = {
-//     voltage: new uom(db.voltage, "kilovolt")
-// }
-// ...
-// data.voltage.changeUnit({newUnit: "volt_mega"})
-// console.log(`${data.voltage.value} ${data.voltage.suffix}`)
-// data.voltage.printPretty("volt")
-// console.log(`${data.voltage.printPretty()}`)
-// data.voltage.add(10000, "volt_mega")
-// data.voltage.add(1, "volt_kilo")

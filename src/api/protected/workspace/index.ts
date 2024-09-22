@@ -1,5 +1,6 @@
 import { isValidObjectId, PipelineStage, Types } from 'mongoose';
 
+import lib_area_geolocation from '@/models/lib_area_geolocation';
 import { workspace as entity, tokenInvitation, device as deviceEntity } from '@/models';
 import { ITokenInvitationModelWithId } from '@/models/tokenInvitation';
 import { IWorkspaceModelWithId as IEntityModel, IWorkspaceModelWithId } from '@/models/workspace';
@@ -255,22 +256,16 @@ export default () =>
     post: async ({ account, body }, res) => {
       const data = body as InputProtectedWorkspacePostBody;
       const payload = {
-        ...body,
         name: data.name,
         language: data.language,
         timezone: data.timezone,
         ownerId: account._id,
-        coordinates: data.coordinates
-          ? {
-              latitude: data.coordinates.latitude,
-              longitude: data.coordinates.longitude,
-              elevation: data.coordinates.elevation
-            }
-          : undefined,
-        location: data.coordinates
+        location: data.location
           ? {
               type: 'Point',
-              coordinates: [body.coordinates?.longitude, body.coordinates?.latitude]
+              area: await lib_area_geolocation.getNearestArea({ coord: [data.location?.longitude, data.location?.latitude] }),
+              coordinates: [data.location.longitude, data.location.latitude],
+              elevation: data.location.elevation
             }
           : undefined,
         members: data.members

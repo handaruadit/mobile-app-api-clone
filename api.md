@@ -68,7 +68,7 @@
 {
     workspaces: [
         {
-            _id: <hex string Mongo uuid :ObjectId>,
+            _id: <hex string Mongo uuid :String>,
             name: <workspace name :String>,
             location: {
                 type: <looks like some enum prob :String>,
@@ -78,7 +78,7 @@
                 ]
             },
             timezone: <unix standarized JS Region/City :String>,
-            ownerId: <hex string Mongo uuid :ObjectId>,
+            ownerId: <hex string Mongo uuid :String>,
             members: [],
             createdAt: <unix standarized YYYY-MM-DD with Z (ex T13) :String>,
             updatedAt: <unix standarized YYYY-MM-DD with Z (ex T13) :String>,
@@ -90,13 +90,13 @@
             plnPricePerKwh: < :Number>,
             userAvgMonthlyExpenses: < :Number>,
             device: {
-                _id: <hex string Mongo uuid :ObjectId>,
+                _id: <hex string Mongo uuid :String>,
                 name: <device name :String>,
                 description: <device description :String>,
                 brand: <device brand name :String>,
                 isDefault: true,
                 plantedAt: <unix standarized YYYY-MM-DD with Z (ex T13) :String>,
-                workspace: <hex string Mongo uuid :ObjectId>,
+                workspace: <hex string Mongo uuid :String>,
                 maxPowerOutput: <in watt :Number>,
                 batteryCapacity: <in mAh :Number>,
                 panelSize: <by cells (60, 72 etc) :Number>,
@@ -113,20 +113,20 @@
                 panelCapacity: <in watt :Number>,
                 batteries: [
                     {
-                        batteryId: <hex string Mongo uuid :ObjectId>,
+                        batteryId: <hex string Mongo uuid :String>,
                         uuid: "BSW-ID"
                     }
                 ]
             },
             devicePingStatus: [
                 {
-                    _id: <hex string Mongo uuid :ObjectId>,
+                    _id: <hex string Mongo uuid :String>,
                     lastPing: <in minute :Number>,
                     status: <"online"|"offline" :String>
                 }
             ],
             inverterData: {
-                _id: <hex string Mongo uuid :ObjectId>,
+                _id: <hex string Mongo uuid :String>,
                 totalPowerIn: <in watt :Number>,
                 averagePowerIn: <in watt :Number>,
                 totalPowerOut: <in watt :Number>,
@@ -143,13 +143,13 @@
                 averageAcCurrentOut: <in ampere :Number>
             },
             batteryData: {
-                _id: <hex string Mongo uuid :ObjectId>,
+                _id: <hex string Mongo uuid :String>,
                 totalYield: <in watt :Number>,
                 totalConsumption: <in watt :Number>,
                 totalCharging: <in watt :Number>
             },
             panelData: {
-                _id: <hex string Mongo uuid :ObjectId>,
+                _id: <hex string Mongo uuid :String>,
                 totalYield: <in watt :Number>,
                 totalConsumption: <in watt :Number>,
                 totalCharging: <in watt :Number>,
@@ -262,7 +262,7 @@
 }
 ```
 ### Get Device Statistic
-**Endpoint**: `/workspace/tnstatistic/<device id :ObjectId>`
+**Endpoint**: `/workspace/tnstatistic/<device id :String>`
 
 **Method**: GET
 
@@ -338,4 +338,428 @@
         }
     }
 ]
+```
+### Get Weather Report Daily
+**Endpoint**: `/workspace/tn-weather-daily`
+
+**Method**: GET
+
+**Authorization**: true
+
+**Consumer**:
+- /
+
+**Payload Param/Body**:
+```
+{
+    workspaceId: <hex string Mongo uuid :String>,
+    startDate: [YYYY-MM-DD :String],
+    endDate: [YYYY-MM-DD :String],
+}
+```
+**Response Data**:
+```
+[
+    {
+        precognitionFor: <Unix date format with timezone :String>,
+        humidity: <in percent :Number>,
+        temperature: <in celcius :Number>,
+        weather: <weather generic_name id :String>,
+        wind:{
+            direction: <degrees in bearing :Number>,
+            speed: <in knots :Number>
+        }
+    },
+    ...
+]
+```
+**Example Request**:
+```
+{
+    workspaceId: "66024e24fc18ead0dd7ca32a",
+    startDate: "2024-07-20",
+    endDate: "2024-07-20",
+}
+```
+**Example Response**:
+```
+[
+    {
+        precognitionFor: "2024-07-19T17:00:00.000Z",
+        humidity: 70,
+        temperature: 23,
+        weather: "cloudy",
+        wind: {
+            direction: 112.5,
+            speed: 10
+        }
+    }
+]
+```
+
+## Weather
+### Fetch Weather Data from BMKG for Current Date
+**Endpoint**: `/weather/tn-report-daily-bmkg`
+
+**Method**: GET
+
+**Authorization**: true
+
+**Consumer**:
+- /
+
+**Payload Param**:
+```
+{
+    
+}
+```
+**Response Data**:
+```
+[
+    {
+        area_id: <areaSize-coded separated id :String>,
+        bmkg_id: <decimal bmkg id :String>,
+        precognition_for: <Unix date format with timezone :String>,
+        humidity: <in percent :Number>,
+        temperature: <in celcius :Number>,
+        weather: <weather generic_name id :String>,
+        wind_direction: <degrees in bearing :Number>,
+        wind_speed: <in knots :Number>,
+        created_at: <Unix date format with timezone :String>,
+        _id: <auto-generated mongo ObjectID :String>,
+        __v: 0,
+        createdAt: <Unix date format with timezone :String>,
+        updatedAt: <Unix date format with timezone :String>
+    },
+    ...
+]
+```
+**Example Request**:
+```
+{
+    a: ""
+}
+```
+**Example Response**:
+```
+[
+    {
+        area_id: "11.05",
+        bmkg_id: "501400",
+        precognition_for: "2024-07-19T23:00:00.000Z",
+        humidity: 65,
+        temperature: 33,
+        weather: "sunny",
+        wind_direction: 225,
+        wind_speed: 5,
+        created_at: "2024-08-24T09:12:55.151Z",
+        _id: "66c9a4402c8f363adc6e0c53",
+        __v: 0,
+        createdAt: "2024-08-24T09:13:37.056Z",
+        updatedAt: "2024-08-24T09:13:37.056Z"
+    },
+    {
+        area_id: "unknown(501409)",
+        bmkg_id: "501409",
+        precognition_for: "2024-07-19T17:00:00.000Z",
+        humidity: 80,
+        temperature: 26,
+        weather: "sunny",
+        wind_direction: 67.5,
+        wind_speed: 5,
+        created_at: "2024-08-24T09:12:55.151Z",
+        _id: "66c9a4402c8f363adc6e0c4e",
+        __v: 0,
+        createdAt: "2024-08-24T09:13:37.054Z",
+        updatedAt: "2024-08-24T09:13:37.054Z"
+    }
+]
+```
+### Get Weather Report Daily Area
+**Endpoint**: `/weather/tn-report-daily-area`
+
+**Method**: GET
+
+**Authorization**: true
+
+**Consumer**:
+- /
+
+**Payload Param/Body**:
+```
+{
+    startDate: [YYYY-MM-DD :String],
+    endDate: [YYYY-MM-DD :String],
+    areaId: [<areaSize-coded separated id :String>,...]
+}
+```
+**Response Data**:
+```
+[
+    {
+        _id: <auto-generated mongo ObjectID :String>,
+        area_id:[ <areaSize-coded separated id :String>,...],
+        bmkg_id: <decimal bmkg id :String>,
+        precognition_for: <Unix date format with timezone :String>,
+        humidity: <in percent :Number>,
+        temperature: <in celcius :Number>,
+        weather: <weather generic_name id :String>,
+        wind_direction: <degrees in bearing :Number>,
+        wind_speed: <in knots :Number>,
+        created_at: <Unix date format with timezone :String>,
+        __v: 0,
+        createdAt: <Unix date format with timezone :String>,
+        updatedAt: <Unix date format with timezone :String>
+    },
+    ...
+]
+```
+**Example Request**:
+```
+{
+    startDate: "2024-07-20"
+    endDate: "2024-07-20"
+    areaId: ["11.01"]
+}
+```
+**Example Response**:
+```
+[
+    {
+        _id: "66c6cd0e5d3fd40ddc6fdd3b",
+        area_id: "11.01",
+        bmkg_id: "501417",
+        precognition_for: "2024-07-19T17:00:00.000Z",
+        humidity: 80,
+        temperature: 22,
+        weather: "sunny",
+        wind_direction: 22.5,
+        wind_speed: 2,
+        created_at: "2024-08-22T05:30:25.782Z",
+        __v: 0,
+        createdAt: "2024-08-22T05:30:55.210Z",
+        updatedAt: "2024-08-22T05:30:55.210Z"
+    }
+]
+```
+### Some Endpoint Big Title
+**Endpoint**: `/weather/tn-report-daily-area`
+
+**Method**: GET
+
+**Authorization**: true
+
+**Consumer**:
+- /
+
+**Payload Param**:
+```
+{
+    startDate: [YYYY-MM-DD :String],
+    endDate: [YYYY-MM-DD :String],
+    longitude: <-180 to 180 :String|Number>,
+    latitude: <-90 to 90 :String|Number>
+}
+```
+**Response Data**:
+```
+{
+    area: {
+        id: <areaSize-coded separated id :String>,
+        label: <area full name :String>
+    },
+    weatherReport:[
+        {
+            precognitionFor: <Unix date format with timezone :String>,
+            humidity: <in percent :Number>,
+            temperature: <in celcius :Number>,
+            weather: <weather generic_name id :String>,
+            wind:{
+                speed: <in knots :Number>
+                direction: <degrees in bearing :Number>,
+            }
+            createdAt: <Unix date format with timezone :String>
+        },
+        ...
+    ]
+}
+```
+**Example Request**:
+```
+{
+    startDate: "2024-07-20",
+    endDate: "2024-07-20",
+    longitude: "-182.99281"
+    latitude: 69.22343
+}
+```
+**Example Response**:
+```
+{
+    area: {
+        id: "53.14",
+        label: "Rote Ndao"
+    },
+    weatherReport:[
+        {
+            _id: "66c6cd0f5d3fd40ddc6fe1ff",
+            area_id: "53.14",
+            bmkg_id: "501428",
+            precognition_for: "2024-07-19T17:00:00.000Z",
+            humidity: 70,
+            temperature: 26,
+            weather: "mildly_cloudy",
+            wind_direction: 90,
+            wind_speed: 20,
+            created_at: "2024-08-22T05:30:25.782Z",
+            __v: 0,
+            createdAt: "2024-08-22T05:30:55.305Z",
+            updatedAt: "2024-08-22T05:30:55.305Z"
+        },
+        {
+            _id: "66c9a4402c8f363adc6e1122",
+            area_id: "53.14",
+            bmkg_id: "501428",
+            precognition_for: "2024-07-19T17:00:00.000Z",
+            humidity: 70,
+            temperature: 26,
+            weather: "mildly_cloudy",
+            wind_direction: 90,
+            wind_speed: 20,
+            created_at: "2024-08-24T09:12:55.151Z",
+            __v: 0,
+            createdAt: "2024-08-24T09:13:37.154Z",
+            updatedAt: "2024-08-24T09:13:37.154Z"
+        }
+    ]
+}
+```
+
+## Location
+### Get List of Location Master Data
+**Endpoint**: `/location/tn-area-list`
+
+**Method**: GET
+
+**Authorization**: true
+
+**Consumer**:
+- /
+
+**Payload Param**:
+```
+{
+}
+```
+**Response Data**:
+```
+[
+    {
+        _id: <hex string Mongo uuid :String>,
+        area_id: <areaSize-coded separated id :String>,
+        generic: <human coded pseudo id :String>,
+        label: <area full name :String>,
+        areaSize: [area size :String],
+        areaType: [area type of region-sized and below :String],
+        coordinate: [lat long whitespace separated :String],
+        bmkgId: [decimal bmkg id :String],
+        created_at: <Unix date format with timezone :String>,
+        __v: 0,
+        createdAt: <Unix date format with timezone :String>,
+        updatedAt: <Unix date format with timezone :String>
+    },
+    ...
+]
+```
+**Example Request**:
+```
+{
+}
+```
+**Example Response**:
+```
+[
+    {
+        _id: "66d07c5d491b59047da0b4fa",
+        area_id: "11",
+        generic: "prov_aceh",
+        label: "Aceh (NAD)",
+        areaSize: "province",
+        created_at: "2024-08-29T13:48:55.004Z",
+        __v: 0,
+        createdAt: "2024-08-29T13:49:16.987Z",
+        updatedAt: "2024-08-29T13:49:16.987Z"
+    },
+    {
+        _id: "66d07c5d491b59047da0b4fb",
+        area_id: "11.10",
+        generic: "",
+        label: "Aceh Singkil",
+        areaSize: "region",
+        areaType: "regency",
+        coordinate: "97.85 2.31",
+        bmkgId: "501414",
+        created_at: "2024-08-29T13:48:55.004Z",
+        __v: 0,
+        createdAt: "2024-08-29T13:49:16.988Z",
+        updatedAt: "2024-08-29T13:49:16.988Z"
+    }
+]
+```
+### Get Detail of Area
+**Endpoint**: `/location/tn-area-single`
+
+**Method**: GET
+
+**Authorization**: true
+
+**Consumer**:
+- /
+
+**Payload Param**:
+```
+{
+    areaId: <areaSize-coded separated id :String>
+}
+```
+**Response Data**:
+```
+{
+    _id: <hex string Mongo uuid :String>,
+    area_id: <areaSize-coded separated id :String>,
+    generic: <human coded pseudo id :String>,
+    label: <area full name :String>,
+    areaSize: [area size :String],
+    areaType: [area type of region-sized and below :String],
+    coordinate: [lat long whitespace separated :String],
+    bmkgId: [decimal bmkg id :String],
+    created_at: <Unix date format with timezone :String>,
+    __v: 0,
+    createdAt: <Unix date format with timezone :String>,
+    updatedAt: <Unix date format with timezone :String>
+}
+```
+**Example Request**:
+```
+{
+    areaId: "10.11"
+}
+```
+**Example Response**:
+```
+{
+    _id: "66d07c5d491b59047da0b4fb",
+    area_id: "11.10",
+    generic: "",
+    label: "Aceh Singkil",
+    areaSize: "region",
+    areaType: "regency",
+    coordinate: "97.85 2.31",
+    bmkgId: "501414",
+    created_at: "2024-08-29T13:48:55.004Z",
+    __v: 0,
+    createdAt: "2024-08-29T13:49:16.988Z",
+    updatedAt: "2024-08-29T13:49:16.988Z"
+}
 ```

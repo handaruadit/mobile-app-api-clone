@@ -95,6 +95,16 @@ export default class Abstract {
     return result;
   };
 
+  createBulk = async <T>(payload: AnyKeys<any>): Promise<T> => {
+    const doc = await this.model.insertMany(payload);
+
+    const query = this.model.findById(doc);
+
+    const result = await query.lean();
+
+    return result;
+  };
+
   update = async <T>(id: string | Types.ObjectId, payload: AnyKeys<any>, overwrite?: boolean): Promise<T> => {
     const payloadSet = overwrite ? payload : flattenObject(payload);
 

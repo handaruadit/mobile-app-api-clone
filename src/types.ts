@@ -40,6 +40,7 @@ export * from './interfaces/endpoints/protected/workspace';
 export * from './interfaces/endpoints/protected/workspace/main-data';
 export * from './interfaces/endpoints/protected/workspace/timeseries-data';
 export * from './interfaces/endpoints/protected/notification';
+export * from './interfaces/endpoints/protected/weather/tn-report-daily-area';
 
 // RUNNER
 export * from './interfaces/endpoints/runner/workspace';

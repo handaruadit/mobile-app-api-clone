@@ -11,7 +11,7 @@ export function createPipelineCalculateField(fields: Record<string, any>, exclud
   return Object.keys(fields)
     .filter(key => !exclude.includes(key))
     .reduce((acc: any, key: any) => {
-      const [operation, ...fieldParts] = key.split('_');
+      const [operation, ...fieldParts] = key.split(/([A-Z]{1}\w*)/, 2);
       let mongoOperator;
 
       switch (operation) {
@@ -30,8 +30,10 @@ export function createPipelineCalculateField(fields: Record<string, any>, exclud
         default:
           throw new Error(`Unknown operation: ${operation}`);
       }
+      const comPart = fieldParts[0].split('');
+      comPart[0] = comPart[0].toLowerCase();
+      acc[key] = { [mongoOperator]: `$${comPart.join('')}` };
 
-      acc[key] = { [mongoOperator]: `$${fieldParts.join('_')}` };
       return acc;
     }, {});
 }

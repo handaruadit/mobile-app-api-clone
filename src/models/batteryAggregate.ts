@@ -20,35 +20,35 @@ const field = {
   },
   metadata: { type: Object },
 
-  max_volt: Number,
-  min_volt: Number,
-  avg_volt: Number,
-  total_volt: Number,
+  maxVolt: Number,
+  minVolt: Number,
+  avgVolt: Number,
+  totalVolt: Number,
 
-  min_power: Number,
-  max_power: Number,
-  avg_power: Number,
-  total_power: Number,
+  minPower: Number,
+  maxPower: Number,
+  avgPower: Number,
+  totalPower: Number,
 
-  min_current: Number,
-  max_current: Number,
-  avg_current: Number,
-  total_current: Number,
+  minCurrent: Number,
+  maxCurrent: Number,
+  avgCurrent: Number,
+  totalCurrent: Number,
 
-  min_humidity: Number,
-  max_humidity: Number,
-  avg_humidity: Number,
+  minHumidity: Number,
+  maxHumidity: Number,
+  avgHumidity: Number,
 
-  min_temperature: Number,
-  max_temperature: Number,
-  avg_temperature: Number,
-  total_temperature: Number,
+  minTemperature: Number,
+  maxTemperature: Number,
+  avgTemperature: Number,
+  totalTemperature: Number,
 
-  total_energy: Number,
-  total_charged: Number,
-  total_discharged: Number,
+  totalEnergy: Number,
+  totalCharged: Number,
+  totalDischarged: Number,
 
-  data_points: Number,
+  dataPoints: Number,
   year: Number,
   month: Number,
   week: Number,
@@ -115,28 +115,28 @@ class BatteryAggregator extends DataAggregator {
   definePipeline() {
     this.pipelineBaseField = {
       ...DataAggregator.pipelineCommonField,
-      total_energy: 1,
+      totalEnergy: 1,
       //humidity
-      max_humidity: 1,
-      min_humidity: 1,
-      avg_humidity: 1,
+      maxHumidity: 1,
+      minHumidity: 1,
+      avgHumidity: 1,
       //temperature
-      max_temperature: 1,
-      min_temperature: 1,
-      avg_temperature: 1
+      maxTemperature: 1,
+      minTemperature: 1,
+      avgTemperature: 1
     };
 
     this.pipelineCalculateField = {
       ...DataAggregator.pipelineCommonCalculateField,
-      total_energy: { $sum: { $multiply: ['$voltage', '$ampere'] } },
+      totalEnergy: { $sum: { $multiply: ['$voltage', '$ampere'] } },
       //humidity
-      max_humidity: { $max: '$humidity' },
-      min_humidity: { $min: '$humidity' },
-      avg_humidity: { $avg: '$humidity' },
+      maxHumidity: { $max: '$humidity' },
+      minHumidity: { $min: '$humidity' },
+      avgHumidity: { $avg: '$humidity' },
       //temperature
-      max_temperature: { $max: '$temperature' },
-      min_temperature: { $min: '$temperature' },
-      avg_temperature: { $avg: '$temperature' }
+      maxTemperature: { $max: '$temperature' },
+      minTemperature: { $min: '$temperature' },
+      avgTemperature: { $avg: '$temperature' }
     };
 
     this.minutePipeline = [

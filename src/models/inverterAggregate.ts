@@ -20,7 +20,7 @@ const indentifier = {
     ref: 'Device'
   },
   metadata: { type: Object },
-  data_points: Number,
+  dataPoints: Number,
   year: Number,
   month: Number,
   week: Number,
@@ -37,32 +37,32 @@ const indentifier = {
 const field = {
   // With each prefix equals mongo operator
   //
-  max_acVoltageIn: { type: Number, default: 0 },
-  min_acVoltageIn: { type: Number, default: 0 },
-  avg_acVoltageIn: { type: Number, default: 0 },
-  total_acVoltageIn: { type: Number, default: 0 },
-  max_acVoltageOut: { type: Number, default: 0 },
-  min_acVoltageOut: { type: Number, default: 0 },
-  avg_acVoltageOut: { type: Number, default: 0 },
-  total_acVoltageOut: { type: Number, default: 0 },
+  maxAcVoltageIn: { type: Number, default: 0 },
+  minAcVoltageIn: { type: Number, default: 0 },
+  avgAcVoltageIn: { type: Number, default: 0 },
+  totalAcVoltageIn: { type: Number, default: 0 },
+  maxAcVoltageOut: { type: Number, default: 0 },
+  minAcVoltageOut: { type: Number, default: 0 },
+  avgAcVoltageOut: { type: Number, default: 0 },
+  totalAcVoltageOut: { type: Number, default: 0 },
 
-  max_acPowerIn: { type: Number, default: 0 },
-  min_acPowerIn: { type: Number, default: 0 },
-  avg_acPowerIn: { type: Number, default: 0 },
-  total_acPowerIn: { type: Number, default: 0 },
-  max_acPowerOut: { type: Number, default: 0 },
-  min_acPowerOut: { type: Number, default: 0 },
-  avg_acPowerOut: { type: Number, default: 0 },
-  total_acPowerOut: { type: Number, default: 0 },
+  maxAcPowerIn: { type: Number, default: 0 },
+  minAcPowerIn: { type: Number, default: 0 },
+  avgAcPowerIn: { type: Number, default: 0 },
+  totalAcPowerIn: { type: Number, default: 0 },
+  maxAcPowerOut: { type: Number, default: 0 },
+  minAcPowerOut: { type: Number, default: 0 },
+  avgAcPowerOut: { type: Number, default: 0 },
+  totalAcPowerOut: { type: Number, default: 0 },
 
-  max_acCurrentIn: { type: Number, default: 0 },
-  min_acCurrentIn: { type: Number, default: 0 },
-  avg_acCurrentIn: { type: Number, default: 0 },
-  total_acCurrentIn: { type: Number, default: 0 },
-  max_acCurrentOut: { type: Number, default: 0 },
-  min_acCurrentOut: { type: Number, default: 0 },
-  avg_acCurrentOut: { type: Number, default: 0 },
-  total_acCurrentOut: { type: Number, default: 0 }
+  maxAcCurrentIn: { type: Number, default: 0 },
+  minAcCurrentIn: { type: Number, default: 0 },
+  avgAcCurrentIn: { type: Number, default: 0 },
+  totalAcCurrentIn: { type: Number, default: 0 },
+  maxAcCurrentOut: { type: Number, default: 0 },
+  minAcCurrentOut: { type: Number, default: 0 },
+  avgAcCurrentOut: { type: Number, default: 0 },
+  totalAcCurrentOut: { type: Number, default: 0 }
 };
 
 const timeSchema = {
@@ -138,7 +138,7 @@ class InverterAggregator extends DataAggregator {
     this.pipelineCalculateField = {
       // ...DataAggregator.pipelineCommonCalculateField,
       ...pipelineCalculate,
-      data_points: { $sum: 1 }
+      dataPoints: { $sum: 1 }
     };
 
     this.minutePipeline = [

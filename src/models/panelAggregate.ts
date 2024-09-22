@@ -20,7 +20,7 @@ const indentifier = {
     ref: 'Device'
   },
   metadata: { type: Object },
-  data_points: Number,
+  dataPoints: Number,
   year: Number,
   month: Number,
   week: Number,
@@ -35,30 +35,30 @@ const indentifier = {
 };
 
 const field = {
-  max_voltage: { type: Number, default: 0 },
-  min_voltage: { type: Number, default: 0 },
-  avg_voltage: { type: Number, default: 0 },
-  total_voltage: { type: Number, default: 0 },
+  maxVoltage: { type: Number, default: 0 },
+  minVoltage: { type: Number, default: 0 },
+  avgVoltage: { type: Number, default: 0 },
+  totalVoltage: { type: Number, default: 0 },
 
-  max_power: { type: Number, default: 0 },
-  min_power: { type: Number, default: 0 },
-  avg_power: { type: Number, default: 0 },
-  total_power: { type: Number, default: 0 },
+  maxPower: { type: Number, default: 0 },
+  minPower: { type: Number, default: 0 },
+  avgPower: { type: Number, default: 0 },
+  totalPower: { type: Number, default: 0 },
 
-  max_current: { type: Number, default: 0 },
-  min_current: { type: Number, default: 0 },
-  avg_current: { type: Number, default: 0 },
-  total_current: { type: Number, default: 0 },
+  maxCurrent: { type: Number, default: 0 },
+  minCurrent: { type: Number, default: 0 },
+  avgCurrent: { type: Number, default: 0 },
+  totalCurrent: { type: Number, default: 0 },
 
-  max_lux: { type: Number, default: 0 },
-  min_lux: { type: Number, default: 0 },
-  avg_lux: { type: Number, default: 0 },
-  total_lux: { type: Number, default: 0 },
+  maxLux: { type: Number, default: 0 },
+  minLux: { type: Number, default: 0 },
+  avgLux: { type: Number, default: 0 },
+  totalLux: { type: Number, default: 0 },
 
-  max_temperature: { type: Number, default: 0 },
-  min_temperature: { type: Number, default: 0 },
-  avg_temperature: { type: Number, default: 0 },
-  total_temperature: { type: Number, default: 0 }
+  maxTemperature: { type: Number, default: 0 },
+  minTemperature: { type: Number, default: 0 },
+  avgTemperature: { type: Number, default: 0 },
+  totalTemperature: { type: Number, default: 0 }
 };
 
 const timeSchema = {
@@ -134,7 +134,7 @@ class panelAggregator extends DataAggregator {
     this.pipelineCalculateField = {
       // ...DataAggregator.pipelineCommonCalculateField,
       ...pipelineCalculate,
-      data_points: { $sum: 1 }
+      dataPoints: { $sum: 1 }
     };
 
     this.minutePipeline = [

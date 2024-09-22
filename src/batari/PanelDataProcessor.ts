@@ -140,7 +140,7 @@ export default class PanelStats implements DataStats {
         data =>
           ({
             time: data.sentAt,
-            powerGenerated: data.total_power != null ? parseFloat(data.total_power.toFixed(4)) : data.total_power
+            powerGenerated: data.totalPower != null ? parseFloat(data.totalPower.toFixed(4)) : data.totalPower
           } as OutputTimeseriesPanelData)
       );
     }

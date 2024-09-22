@@ -9,7 +9,7 @@
     },
     "target": "es2019",
     "module": "commonjs",
-    "lib": ["es6"],
+    "lib": ["es5", "es6", "dom", "dom.iterable"],
     "moduleResolution": "node",
     "sourceMap": true,
     "noImplicitAny": true,

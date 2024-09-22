@@ -1,9 +1,10 @@
 import resource from '@/middleware/resource-router-middleware';
-import log from '@/lib/logger';
+import { lib_area_geolocation as entity } from '@/models';
 
 export default () =>
   resource({
     list: async ({ query }, res) => {
-      res.send(log.error({ message: 'Awawahh' }));
+      const queryResult = await entity.getLibList();
+      return res.json(queryResult);
     }
   });

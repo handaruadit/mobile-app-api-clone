@@ -122,14 +122,13 @@ export interface IOutputWorkspace {
   calculatedAvgDailyConsumption?: number;
   avgSunlightPerDay?: number;
   plnPricePerKwh?: number;
-  coordinates?: {
-    latitude?: number;
-    longitude?: number;
-    elevation?: number;
-  };
+  wifiSsid?: string;
+  wifiPassword?: string;
   location?: {
     type?: string;
+    area?: string;
     coordinates?: [number, number];
+    elevation?: string;
   };
   createdAt?: NativeDate | string;
   updatedAt?: NativeDate | string;

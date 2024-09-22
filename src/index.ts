@@ -34,9 +34,9 @@ app.use(autorizationMiddleware);
 
 const client = new RedisCache();
 const mqtt = new MQTT();
+const env = process.env.NODE_ENV ?? '';
 
 firebase.getInstance();
-
 // connect to db
 initializeDb()
   .then((db?: mongoose.Connection) => {
@@ -45,7 +45,9 @@ initializeDb()
       return;
     }
 
-    startCronJobs();
+    if (env.toLowerCase() === 'production') {
+      startCronJobs();
+    }
 
     // api router
     app.use('/api', api({ config, client, db }));

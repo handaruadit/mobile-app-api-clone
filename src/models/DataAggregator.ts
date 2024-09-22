@@ -35,42 +35,42 @@ abstract class DataAggregator {
           }
         }
       },
-      max_volt: 1,
-      min_volt: 1,
-      avg_volt: 1,
-      total_volt: 1,
+      maxVolt: 1,
+      minVolt: 1,
+      avgVolt: 1,
+      totalVolt: 1,
       //power
-      max_power: 1,
-      min_power: 1,
-      avg_power: 1,
-      total_power: 1,
+      maxPower: 1,
+      minPower: 1,
+      avgPower: 1,
+      totalPower: 1,
       //current
-      max_current: 1,
-      min_current: 1,
-      avg_current: 1,
-      total_current: 1,
+      maxCurrent: 1,
+      minCurrent: 1,
+      avgCurrent: 1,
+      totalCurrent: 1,
 
-      data_points: 1
+      dataPoints: 1
     };
   }
   static get pipelineCommonCalculateField() {
     return {
       //volt
-      max_volt: { $max: '$voltage' },
-      min_volt: { $min: '$voltage' },
-      avg_volt: { $avg: '$voltage' },
-      total_volt: { $sum: '$voltage' },
+      maxVolt: { $max: '$voltage' },
+      minVolt: { $min: '$voltage' },
+      avgVolt: { $avg: '$voltage' },
+      totalVolt: { $sum: '$voltage' },
       //power
-      max_power: { $max: '$power' },
-      min_power: { $min: '$power' },
-      avg_power: { $avg: '$power' },
-      total_power: { $sum: '$power' },
+      maxPower: { $max: '$power' },
+      minPower: { $min: '$power' },
+      avgPower: { $avg: '$power' },
+      totalPower: { $sum: '$power' },
       //current
-      max_current: { $max: '$current' },
-      min_current: { $min: '$current' },
-      avg_current: { $avg: '$current' },
-      total_current: { $sum: '$current' },
-      data_points: { $sum: 1 }
+      maxCurrent: { $max: '$current' },
+      minCurrent: { $min: '$current' },
+      avgCurrent: { $avg: '$current' },
+      totalCurrent: { $sum: '$current' },
+      dataPoints: { $sum: 1 }
     };
   }
 }

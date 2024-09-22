@@ -3,8 +3,8 @@
  * a workspace can have multiple devices.
  * a workspace must have an admin.
  */
-import { model, Schema, isValidObjectId } from 'mongoose';
-import type { InferSchemaType, Types, Model, PipelineStage } from 'mongoose';
+import { model, Schema, isValidObjectId, Types } from 'mongoose';
+import type { InferSchemaType, Model, PipelineStage } from 'mongoose';
 
 import Abstract from '@/models/abstract';
 import { IUserMinimalModel } from '@/types';
@@ -24,14 +24,11 @@ const schema = new Schema(
       type: Boolean,
       defaultValue: false
     },
-    coordinates: {
-      latitude: Number,
-      longitude: Number,
-      elevation: Number
-    },
     location: {
       type: { type: String },
-      coordinates: [Number, Number]
+      area: String,
+      coordinates: [Number, Number],
+      elevation: Number
     },
     language: {
       type: String
@@ -46,6 +43,8 @@ const schema = new Schema(
     calculatedAvgDailyConsumption: Number, // kWh
     calculatedAvgMonthlyExpenses: Number, // kWh
     avgSunlightPerDay: Number, // hour
+    wifiSsid: String,
+    wifiPassword: String,
     ownerId: {
       type: Schema.Types.ObjectId,
       required: [true, ValidationErrorCodes.OWNER_REQUIRED],
@@ -319,6 +318,18 @@ class MongooseModel extends Abstract {
     };
 
     return modifier[state];
+  };
+
+  getDetailSingleRaw = async ({ workspaceId }: any) => {
+    const dbRes: any = await this.model.aggregate([
+      {
+        $match: {
+          _id: new Types.ObjectId(workspaceId)
+        }
+      }
+    ]);
+
+    return dbRes ? (dbRes[0] as any) : {};
   };
 }
 

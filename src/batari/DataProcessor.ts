@@ -51,7 +51,7 @@ export class DataProcessor {
     if (this.data.length == 0) {
       return false;
     } else {
-      return 'avg_humidity' in this.data[0];
+      return 'avgHumidity' in this.data[0];
     }
   }
 
@@ -71,7 +71,7 @@ export class DataProcessor {
     if (this.data.length == 0) {
       return false;
     } else {
-      return 'total_acVoltageIn' in this.data[0];
+      return 'totalAcVoltageIn' in this.data[0];
     }
   }
 

@@ -12,3 +12,6 @@ export { default as notification } from './notification';
 export { default as batteryAggregate } from './batteryAggregate';
 export { default as inverterAggregate } from './inverterAggregate';
 export { default as panelAggregate } from './panelAggregate';
+export { default as stream_daily_weather_report } from './stream_daily_weather_report';
+export { default as lib_area_geolocation } from './lib_area_geolocation';
+export { default as exportData } from './exportData';

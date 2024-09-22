@@ -15,14 +15,10 @@ export interface OutputProtectedWorkspaceGet {
 // POST
 export interface InputProtectedWorkspacePostBody {
   name: string;
-  coordinates?: {
-    latitude?: number;
-    longitude?: number;
-    elevation?: number;
-  };
   location?: {
-    type?: string;
-    coordinates?: [number, number];
+    longitude: number;
+    latitude: number;
+    elevation: number;
   };
   language?: string;
   timezone?: string;

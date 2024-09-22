@@ -212,29 +212,23 @@ export default () =>
           };
         })
         .map((date: any) => {
-          date.panel_solar_produced.set({ unit: 'watt_kilo' });
-          date.battery_charged.set({ unit: 'watt_kilo' });
-          date.power_generated_from_grid.set({ unit: 'watt_kilo' });
-          date.power_generated_from_pv.set({ unit: 'watt_kilo' });
-          date.power_total_consumed.set({ unit: 'watt_kilo' });
-
           return {
             panel: {
-              solar_produced: date.panel_solar_produced.value,
+              solar_produced: date.panel_solar_produced.set({ unit: 'watt_kilo' }),
               lux: date.panel_lux,
               temperature: date.panel_temperature
             },
             battery: {
-              charged: date.battery_charged.value,
+              charged: date.battery_charged.set({ unit: 'watt_kilo' }),
               temperature: date.battery_temperature,
               humidity: date.battery_humidity
             },
             power: {
-              generated_from_grid: date.power_generated_from_grid.value,
-              generated_from_pv: date.power_generated_from_pv.value,
-              total_consumed: date.power_total_consumed.value
+              generated_from_grid: date.power_generated_from_grid.set({ unit: 'watt_kilo' }),
+              generated_from_pv: date.power_generated_from_pv.set({ unit: 'watt_kilo' }),
+              total_consumed: date.power_total_consumed.set({ unit: 'watt_kilo' })
             },
-            go_green: greenEnergyCalculator(date.power_generated_from_grid.value)
+            go_green: greenEnergyCalculator(date.power_generated_from_grid.set({ unit: 'watt_kilo' }))
           };
         });
 

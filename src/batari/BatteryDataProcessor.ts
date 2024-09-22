@@ -97,11 +97,11 @@ export default class BatteryStats implements DataStats {
 
       data = aggregateData.map(item => ({
         ...item,
-        power: item.avg_power,
-        current: item.avg_current,
-        voltage: item.avg_voltage,
-        charged: item.total_charged,
-        discharged: item.total_discharged
+        power: item.avgPower,
+        current: item.avgCurrent,
+        voltage: item.avgVoltage,
+        charged: item.totalCharged,
+        discharged: item.totalDischarged
       }));
     }
     this.dataProcessor = new DataProcessor(data as ISitesData[]);
@@ -200,8 +200,8 @@ export default class BatteryStats implements DataStats {
         data =>
           ({
             time: data.sentAt,
-            charged: data.total_charged != null ? parseFloat(data.total_charged.toFixed(4)) : data.total_charged,
-            discharged: data.total_discharged != null ? parseFloat(data.total_discharged.toFixed(4)) : data.total_discharged
+            charged: data.totalCharged != null ? parseFloat(data.totalCharged.toFixed(4)) : data.totalCharged,
+            discharged: data.totalDischarged != null ? parseFloat(data.totalDischarged.toFixed(4)) : data.totalDischarged
           } as OutputTimeseriesBatteryData)
       );
     }

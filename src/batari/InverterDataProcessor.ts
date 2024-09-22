@@ -50,14 +50,14 @@ export default class InverterStats implements DataStats {
         .lean();
       data = aggregateData.map(item => ({
         ...item,
-        power: item.avg_acPowerOut,
+        power: item.avgAcPowerOut,
         siteId: item.workspaceId,
-        acVoltageIn: item.avg_acVoltageIn,
-        acVoltageOut: item.avg_acVoltageOut,
-        acPowerIn: item.total_acPowerIn,
-        acPowerOut: item.total_acPowerOut,
-        acCurrentIn: item.avg_acCurrentIn,
-        acCurrentOut: item.avg_acCurrentOut
+        acVoltageIn: item.avgAcVoltageIn,
+        acVoltageOut: item.avgAcVoltageOut,
+        acPowerIn: item.totalAcPowerIn,
+        acPowerOut: item.totalAcPowerOut,
+        acCurrentIn: item.avgAcCurrentIn,
+        acCurrentOut: item.avgAcCurrentOut
       }));
     }
 
@@ -138,8 +138,8 @@ export default class InverterStats implements DataStats {
         data =>
           ({
             time: data.sentAt,
-            powerUsage: data.total_acPowerOut != null ? parseFloat(data.total_acPowerOut.toFixed(4)) : data.total_acPowerOut,
-            chargedFromGrid: data.total_acPowerIn != null ? parseFloat(data.total_acPowerIn.toFixed(4)) : data.total_acPowerIn
+            powerUsage: data.totalAcPowerOut != null ? parseFloat(data.totalAcPowerOut.toFixed(4)) : data.totalAcPowerOut,
+            chargedFromGrid: data.totalAcPowerIn != null ? parseFloat(data.totalAcPowerIn.toFixed(4)) : data.totalAcPowerIn
           } as OutputTimeseriesInverterData)
       );
     }
