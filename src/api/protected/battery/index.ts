@@ -1,8 +1,5 @@
-import { isValidObjectId } from 'mongoose';
-
 import resource from '@/middleware/resource-router-middleware';
 import BatteryTelemetryAgg from '@/models/batteryDataAggregated';
-import deviceModel from '@/models/device';
 import { BatteryDerivedMetrics } from '@/batari/BatteryDataProcessorV2';
 import { BatteryTelemetryAgg as IBatteryTelemetryAgg } from '@/types/batteryData';
 import { workspace } from '@/models';
@@ -21,8 +18,13 @@ export default () =>
         const {
           siteId,
           batteryId,
-          windowSize = '1m', // default to '1m'
+          windowSize = '1m',
           days = 1
+        }: {
+          siteId?: string;
+          batteryId?: string;
+          windowSize?: string;
+          days?: number;
         } = { ...params, ...query };
 
         if (!siteId && !batteryId) {

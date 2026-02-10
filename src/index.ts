@@ -34,7 +34,6 @@ app.use(autorizationMiddleware);
 
 const client = new RedisCache();
 const mqtt = new MQTT();
-const env = process.env.NODE_ENV ?? '';
 
 firebase.getInstance();
 // connect to db

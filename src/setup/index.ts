@@ -4,7 +4,6 @@ import initializeDb from '@/db';
 import { workspace, user, device, battery } from '@/models';
 import { IWorkspaceModelWithId } from '@/models/workspace';
 import { IUserModel } from '@/models/user';
-import { IDeviceModelWithId } from '@/models/device';
 import { IBatteryModelWithId } from '@/models/battery';
 import { encryptPassword } from '@/lib/encode';
 
@@ -55,7 +54,6 @@ async function setupMasterData() {
       console.log(`  ID: ${batariAdminUserId.toHexString()}`);
       console.log(`  Name: ${createdMasterUser.name}`);
       console.log(`  Email: ${createdMasterUser.email}`);
-      console.log(`  isActive: ${createdMasterUser.isActive}`);
       console.log(`  Role: ${masterUserPayload.role}`);
     }
 
