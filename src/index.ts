@@ -45,9 +45,9 @@ initializeDb()
       return;
     }
 
-    if (env.toLowerCase() === 'production') {
-      startCronJobs();
-    }
+    // if (env.toLowerCase() === 'production') {
+    startCronJobs();
+    // }
 
     // api router
     app.use('/api', api({ config, client, db }));

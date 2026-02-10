@@ -67,16 +67,57 @@ class MQTT {
 
     this.client = conn;
     this.addMainSubscriber();
+    const siteName = process.env.SITE_NAME;
+    const batteryId = process.env.BATERAI_NAME;
+    if (!siteName || !batteryId) {
+      console.error('Missing NAMA_SITE or ID_BATERAI environment variables');
+      return;
+    }
+    this.addBatterySubscriber(siteName, batteryId);
   };
 
   addMainSubscriber = () => {
     this.client.subscribe('batari-energy/#');
+    console.log('Subscribed to batari-energy/#');
     // this.client.subscribe('batari-energy/st-id/batteries/bat-id');
     this.messenger.processContents();
   };
 
   closeConnection = async () => {
     if (this.client) this.client.end();
+  };
+
+  addBatterySubscriber = (siteName: string, batteryId: string) => {
+    const baseTopic = `${siteName}/${batteryId}`;
+    const topics = [
+      baseTopic,
+      `${baseTopic}/V_Total`,
+      `${baseTopic}/Arus`,
+      `${baseTopic}/SOC`,
+      `${baseTopic}/Suhu_Power_Tube`,
+      `${baseTopic}/Suhu_Balancing_Board`,
+      `${baseTopic}/Suhu_Baterai`,
+      `${baseTopic}/Jumlah_Siklus`,
+      `${baseTopic}/Baterai/Tegangan_Sel`
+    ];
+
+    this.client.subscribe(siteName + "/#", (err: any) => {
+      if (err) {
+        console.error(`Failed to subscribe to topic: ${siteName+"/#"}`, err);
+      } else {
+        console.log(`Subscribed to topic: ${siteName+"/#"}`);
+      }
+    });
+
+    topics.forEach(topic => {
+      this.client.subscribe(topic, (err: any) => {
+        if (err) {
+          console.error(`Failed to subscribe to topic: ${topic}`, err);
+        } else {
+          console.log(`Subscribed to topic: ${topic}`);
+        }
+      });
+    });
   };
 
   // publishToQueues = (queuesArray: string[], payload: any) => {

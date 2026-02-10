@@ -3,6 +3,7 @@ import { device as entity } from '@/models';
 import BatteryStats from './batari/BatteryDataProcessor';
 import PanelStats from './batari/PanelDataProcessor';
 import InverterStats from './batari/InverterDataProcessor';
+import { performBatteryAggregation } from './jobs/batteryAgg.job';
 
 export async function performMinuteAggregation() {
   try {
@@ -93,41 +94,55 @@ export async function performWeeklyAggregation() {
 }
 
 export function startCronJobs() {
-  cron.schedule('* * * * *', async () => {
-    console.log('Running minute aggregation...');
+  cron.schedule('*/1 * * * *', async () => {
+    console.log('Running battery aggregation...');
     try {
-      await performMinuteAggregation();
-      console.log('Minute aggregation completed successfully.');
+      await performBatteryAggregation();
+      console.log('Battery aggregation completed successfully.');
     } catch (error) {
-      console.error('Error during minute aggregation:', error);
+      console.error('Error during battery aggregation:', error);
     }
-  });
-  cron.schedule('0 * * * *', async () => {
-    console.log('Running hour aggregation...');
-    try {
-      await performHourlyAggregation();
-      console.log('Hour aggregation completed successfully.');
-    } catch (error) {
-      console.error('Error during hour aggregation:', error);
-    }
-  });
-  cron.schedule('0 0 * * *', async () => {
-    console.log('Running daily aggregation...');
-    try {
-      await performDailyAggregation();
-      console.log('Daily aggregation completed successfully.');
-    } catch (error) {
-      console.error('Error during daily aggregation:', error);
-    }
+
+    const nextRun = new Date();
+    nextRun.setMinutes(nextRun.getMinutes() + 5);
+    console.log('Next run:', nextRun);
   });
 
-  cron.schedule('0 0 * * 0', async () => {
-    console.log('Running weekly aggregation...');
-    try {
-      await performWeeklyAggregation();
-      console.log('Weekly aggregation completed successfully.');
-    } catch (error) {
-      console.error('Error during weekly aggregation:', error);
-    }
-  });
+  // cron.schedule('* * * * *', async () => {
+  //   console.log('Running minute aggregation...');
+  //   try {
+  //     await performMinuteAggregation();
+  //     console.log('Minute aggregation completed successfully.');
+  //   } catch (error) {
+  //     console.error('Error during minute aggregation:', error);
+  //   }
+  // });
+  // cron.schedule('0 * * * *', async () => {
+  //   console.log('Running hour aggregation...');
+  //   try {
+  //     await performHourlyAggregation();
+  //     console.log('Hour aggregation completed successfully.');
+  //   } catch (error) {
+  //     console.error('Error during hour aggregation:', error);
+  //   }
+  // });
+  // cron.schedule('0 0 * * *', async () => {
+  //   console.log('Running daily aggregation...');
+  //   try {
+  //     await performDailyAggregation();
+  //     console.log('Daily aggregation completed successfully.');
+  //   } catch (error) {
+  //     console.error('Error during daily aggregation:', error);
+  //   }
+  // });
+
+  // cron.schedule('0 0 * * 0', async () => {
+  //   console.log('Running weekly aggregation...');
+  //   try {
+  //     await performWeeklyAggregation();
+  //     console.log('Weekly aggregation completed successfully.');
+  //   } catch (error) {
+  //     console.error('Error during weekly aggregation:', error);
+  //   }
+  // });
 }

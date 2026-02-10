@@ -10,6 +10,9 @@ import { OutputMainBatteryData } from '@/types';
 const schema = new Schema(
   {
     uuid: {
+      type: String // todo: change this to proper UUID or ObjectID
+    },
+    topic: {
       type: String
     },
     siteId: {
@@ -36,6 +39,7 @@ const schema = new Schema(
     humidity: { type: Number }, // percentage
     heatIndex: { type: Number }, // just index
     metadata: { type: Object },
+    metrics: { type: Object },
     // todo in future
     // device: {
     //   type: Schema.Types.ObjectId,
@@ -64,6 +68,12 @@ const schema = new Schema(
     }
   }
 );
+
+// Add specified indexes
+schema.index({ siteId: 1 });
+schema.index({ uuid: 1 });
+schema.index({ topic: 1 });
+schema.index({ sentAt: -1 });
 
 export type IBatteryDataModel = InferSchemaType<typeof schema>;
 export type IBatteryDataModelWithId = IBatteryDataModel & {

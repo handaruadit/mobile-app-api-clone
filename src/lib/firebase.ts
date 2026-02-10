@@ -41,7 +41,7 @@ export default class FirebaseApp {
         console.log('LOG: Test notification sent successfully.');
       })
       .catch(error => {
-        throw new Error(`Error sending test notification: ${error}`);
+        console.error(`Error sending test notification: ${error}`);
       });
   }
 }
